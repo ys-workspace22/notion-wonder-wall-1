@@ -626,6 +626,11 @@
   let celebrated = removedCount >= TOTAL_BRICKS;
   let viewingIndex = null;
 
+  // 아직 Notion에 생성 요청이 진행 중인 할 일들을 추적함.
+  // (추가 직후 바로 체크했을 때, 생성이 끝나기 전에 체크 요청이 나가서
+  //  같은 할 일이 중복으로 생성되는 문제를 막기 위함)
+  const pendingNotionCreates = new Map();
+
   if(!order){ order = shuffledOrder(); localStorage.setItem(LS_ORDER, JSON.stringify(order)); }
 
   function shuffledOrder(){
@@ -786,21 +791,34 @@
 
   function saveTodos(){ localStorage.setItem(LS_TODOS, JSON.stringify(todos)); }
 
-  // 🔄 노션 서버(`/api/notion`)로 데이터를 전송하는 함수 추가
- async function syncToNotion(taskText, isDone, pageId) {
-  try {
-    const res = await fetch('/api/notion', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: taskText, done: isDone, pageId: pageId || null })
-    });
-    const result = await res.json();
-    return result; // { success: true, data: { id: '...', ... } }
-  } catch (err) {
-    console.error('Notion sync failed:', err);
-    return null;
+  // 노션 서버(`/api/notion`)로 데이터를 전송하는 함수.
+  // pageId를 함께 보내면 서버가 "새로 만들기"가 아니라 "기존 행 업데이트"로 처리함.
+  async function syncToNotion(taskText, isDone, pageId) {
+    try {
+      const res = await fetch('/api/notion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: taskText, done: isDone, pageId: pageId || null })
+      });
+      const result = await res.json();
+      return result; // { success: true, data: { id: '...', ... } }
+    } catch (err) {
+      console.error('Notion sync failed:', err);
+      return null;
+    }
   }
-}
+
+  // 체크박스를 눌렀을 때, 그 할 일이 아직 Notion에 생성되는 중이면
+  // 생성이 끝날 때까지 기다렸다가(=notionPageId를 확보한 뒤) 업데이트를 보냄.
+  // 이 대기 없이 바로 보내면, 생성 요청이 아직 안 끝난 상태라 pageId가 비어있어서
+  // 서버가 "새로 만들기"로 처리해버려 중복 행이 생김.
+  async function syncCheckAfterCreate(t){
+    const pending = pendingNotionCreates.get(t.id);
+    if(pending){
+      await pending;
+    }
+    syncToNotion(t.text, t.completed, t.notionPageId);
+  }
 
   function renderTodos(){
     todoListEl.innerHTML = '';
@@ -907,21 +925,26 @@
     msgCard.classList.remove('show');
   });
 
-async function addTodo(){
-  const val = todoInput.value.trim();
-  if(!val) return;
-  const newTodo = { id: Date.now()+Math.random(), text: val, completed: false, notionPageId: null };
-  todos.push(newTodo);
-  todoInput.value = '';
-  saveTodos(); renderTodos();
+  function addTodo(){
+    const val = todoInput.value.trim();
+    if(!val) return;
+    const newTodo = { id: Date.now()+Math.random(), text: val, completed: false, notionPageId: null };
+    todos.push(newTodo);
+    todoInput.value = '';
+    saveTodos(); renderTodos();
 
-  // 노션에 새 행 생성 → 응답으로 받은 page id를 이 할 일에 저장해둠
-  const result = await syncToNotion(val, false);
-  if(result && result.data && result.data.id){
-    newTodo.notionPageId = result.data.id;
-    saveTodos();
+    // 노션에 새 행 생성 요청을 보내고, 진행 중임을 기록해둠.
+    // 응답이 오면 notionPageId를 채워넣고 대기 목록에서 지움.
+    const createPromise = syncToNotion(val, false).then(result => {
+      if(result && result.data && result.data.id){
+        newTodo.notionPageId = result.data.id;
+        saveTodos();
+      }
+      pendingNotionCreates.delete(newTodo.id);
+      return result;
+    });
+    pendingNotionCreates.set(newTodo.id, createPromise);
   }
-}
 
   addBtn.addEventListener('click', addTodo);
   todoInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) addTodo(); });
@@ -931,17 +954,17 @@ async function addTodo(){
     const del = e.target.closest('.del');
     const editBtn = e.target.closest('.edit');
     const txt = e.target.closest('.txt');
-   if(box){
-  const id = box.dataset.id;
-  const t = todos.find(x=> String(x.id) === id);
-  if(t){
-    t.completed = !t.completed;
-    saveTodos();
-    renderTodos();
-    // notionPageId가 있으면 그 행을 업데이트, 없으면(옛날 데이터 등) 새로 생성
-    syncToNotion(t.text, t.completed, t.notionPageId);
-  }
-} else if(del){
+    if(box){
+      const id = box.dataset.id;
+      const t = todos.find(x=> String(x.id) === id);
+      if(t){
+        t.completed = !t.completed;
+        saveTodos();
+        renderTodos();
+        // 노션에 완료 상태 변경 연동 (생성이 진행 중이면 끝날 때까지 기다렸다가 업데이트)
+        syncCheckAfterCreate(t);
+      }
+    } else if(del){
       todos = todos.filter(x=> String(x.id) !== del.dataset.id);
       saveTodos(); renderTodos();
     } else if(editBtn || txt){
