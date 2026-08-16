@@ -1,5 +1,6 @@
 // api/notion.js
 export default async function handler(req, res) {
+  // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -9,9 +10,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
   const { task, done, pageId } = req.body;
-
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
@@ -20,8 +19,8 @@ export default async function handler(req, res) {
 
   try {
     let response;
-
     if (pageId) {
+      // ✅ pageId가 있으면 = 기존 행이 이미 있다는 뜻 → 새로 만들지 않고 업데이트만
       response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
         method: 'PATCH',
         headers: {
@@ -36,6 +35,7 @@ export default async function handler(req, res) {
         })
       });
     } else {
+      // pageId가 없을 때만 = 새로 추가하는 할 일일 때만 새 행 생성
       if (!task || task.trim() === "") {
         return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
       }
@@ -60,18 +60,3 @@ export default async function handler(req, res) {
             "날짜": {
               date: { start: todayISO }
             }
-          }
-        })
-      });
-    }
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Notion API Error');
-    }
-    return res.status(200).json({ success: true, data });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: error.message });
-  }
-}
