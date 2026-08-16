@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         parent: { database_id: DATABASE_ID },
         properties: {
           // 노션 데이터베이스의 '할 일' 컬럼 이름이 '할 일'인 경우
-          " 할 일": {
+          "할 일": {
             title: [
               {
                 text: {
