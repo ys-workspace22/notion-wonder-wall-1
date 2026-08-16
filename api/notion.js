@@ -14,8 +14,10 @@ export default async function handler(req, res) {
   }
 
   const { task, done } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: 'Text is required' });
+  
+  // 수정 포인트: text 대신 task가 안 들어왔는지 확인하도록 변경
+  if (!task) {
+    return res.status(400).json({ error: 'Task is required' });
   }
 
   // Vercel 환경 변수에서 토큰과 DB ID 가져오기
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
           },
           // 체크박스 속성 이름이 'DONE'인 경우
           "DONE": {
-            checkbox: done
+            checkbox: !!done // 안전하게 boolean 값으로 변환
           }
         }
       })
