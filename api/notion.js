@@ -15,9 +15,10 @@ export default async function handler(req, res) {
 
   const { task, done } = req.body;
   
-  // 할 일 내용이 없는 경우 에러 반환
-  if (!task) {
-    return res.status(400).json({ error: 'Task is required' });
+  // 할 일(task) 내용이 없거나 빈 값이면 노션에 새 행을 만들지 않고 종료합니다.
+  // (이 덕분에 체크박스를 누를 때 엉뚱하게 행이 계속 생기는 현상이 방지됩니다.)
+  if (!task || task.trim() === "") {
+    return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
   }
 
   // Vercel 환경 변수에서 토큰과 DB ID 가져오기
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
               }
             ]
           },
-          // 체크박스 속성 'DONE' (초기 생성 시에는 false 또는 전달받은 값)
+          // 체크박스 속성 'DONE'
           "DONE": {
             checkbox: !!done
           }
