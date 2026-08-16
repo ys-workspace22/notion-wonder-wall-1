@@ -2,64 +2,71 @@
 export default async function handler(req, res) {
   // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { task, done } = req.body;
-  
-  // 할 일(task) 내용이 없거나 빈 값이면 노션에 새 행을 만들지 않고 종료합니다.
-  // (이 덕분에 체크박스를 누를 때 엉뚱하게 행이 계속 생기는 현상이 방지됩니다.)
-  if (!task || task.trim() === "") {
-    return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
-  }
+  const { task, done, pageId } = req.body;
 
-  // Vercel 환경 변수에서 토큰과 DB ID 가져오기
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
   try {
-    const response = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${NOTION_TOKEN}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        parent: { database_id: DATABASE_ID },
-        properties: {
-          // 노션 데이터베이스의 '할 일' 컬럼
-          "할 일": {
-            title: [
-              {
-                text: {
-                  content: task
-                }
-              }
-            ]
-          },
-          // 체크박스 속성 'DONE'
-          "DONE": {
-            checkbox: !!done
+    let response;
+
+    if (pageId) {
+      // ✅ pageId가 있으면 = 기존 행이 이미 있다는 뜻 → 새로 만들지 않고 업데이트만
+      response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          properties: {
+            "DONE": { checkbox: !!done }
           }
-        }
-      })
-    });
+        })
+      });
+    } else {
+      // pageId가 없을 때만 = 새로 추가하는 할 일일 때만 새 행 생성
+      if (!task || task.trim() === "") {
+        return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
+      }
+      response = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          parent: { database_id: DATABASE_ID },
+          properties: {
+            "할 일": {
+              title: [
+                { text: { content: task } }
+              ]
+            },
+            "DONE": {
+              checkbox: !!done
+            }
+          }
+        })
+      });
+    }
 
     const data = await response.json();
-
     if (!response.ok) {
       throw new Error(data.message || 'Notion API Error');
     }
-
+    // 생성이든 업데이트든, 결과로 받은 페이지 정보(id 포함)를 그대로 돌려줌
     return res.status(200).json({ success: true, data });
   } catch (error) {
     console.error(error);
