@@ -1,6 +1,6 @@
 // api/notion.js
 export default async function handler(req, res) {
-  // CORS 설정 (프론트엔드와 통신하기 위해 필요)
+  // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   const { task, done } = req.body;
   
-  // 수정 포인트: text 대신 task가 안 들어왔는지 확인하도록 변경
+  // 할 일 내용이 없는 경우 에러 반환
   if (!task) {
     return res.status(400).json({ error: 'Task is required' });
   }
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         parent: { database_id: DATABASE_ID },
         properties: {
-          // 노션 데이터베이스의 '할 일' 컬럼 이름이 '할 일'인 경우
+          // 노션 데이터베이스의 '할 일' 컬럼
           "할 일": {
             title: [
               {
@@ -45,9 +45,9 @@ export default async function handler(req, res) {
               }
             ]
           },
-          // 체크박스 속성 이름이 'DONE'인 경우
+          // 체크박스 속성 'DONE' (초기 생성 시에는 false 또는 전달받은 값)
           "DONE": {
-            checkbox: !!done // 안전하게 boolean 값으로 변환
+            checkbox: !!done
           }
         }
       })
