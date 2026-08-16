@@ -13,7 +13,6 @@ export default async function handler(req, res) {
   const { task, done, pageId } = req.body;
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID = process.env.NOTION_DATABASE_ID;
-  const todayISO = new Date().toISOString().split('T')[0];
 
   try {
     let response;
@@ -53,9 +52,6 @@ export default async function handler(req, res) {
             },
             "DONE": {
               checkbox: !!done
-            },
-            "날짜": {
-              date: { start: todayISO }
             }
           }
         })
