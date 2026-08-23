@@ -7,10 +7,10 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  if (req.method !== 'POST') {
+  // ✅ POST와 PATCH 요청을 모두 허용하도록 수정
+  if (req.method !== 'POST' && req.method !== 'PATCH') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
   const { task, done, pageId, notionToken, notionDb } = req.body;
 
   const AUTH_TOKEN = notionToken || process.env.NOTION_TOKEN;
