@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WonderWall · 원더월</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --ink: #111111;
@@ -31,194 +33,275 @@
     justify-content: center;
     padding: 16px 8px 32px;
   }
-  .app{
-    width:100%;
-    max-width:460px;
-  }
-  header{
-    text-align:center;
-    margin-bottom:22px;
-  }
-  header h1{
-    font-family:'Do Hyeon', sans-serif;
-    font-size:30px;
-    letter-spacing:1px;
-    margin:0 0 4px;
-    color:var(--amber);
-  }
-  header h1 span{ color:var(--amber); }
-  header p{
-    margin:0;
-    font-size:13px;
-    color:var(--paper-dim);
+
+  .app {
+    width: 100%;
+    max-width: 460px;
   }
 
-  .card{
-    background:#ffffff;
-    border:1px solid rgba(0,0,0,.08);
-    border-radius:18px;
-    padding:16px;
-    margin-bottom:16px;
+  header {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  header h1 {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 30px;
+    letter-spacing: 1px;
+    margin: 0 0 4px;
+    color: var(--amber);
+  }
+
+  header h1 span {
+    color: var(--amber);
+  }
+
+  header p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--paper-dim);
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
     box-shadow: var(--shadow);
   }
 
-  .add-row{
-    display:flex;
-    gap:8px;
+  .add-row {
+    display: flex;
+    gap: 8px;
   }
-  .add-row input{
-    flex:1;
-    background:#f9f8f6;
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:11px 12px;
-    color:var(--ink);
-    font-size:14px;
-    font-family:inherit;
-  }
-  .add-row input::placeholder{ color:#999; }
-  .add-row input:focus{ outline:none; border-color:var(--amber); background:#fff; }
-  .add-row button{
-    background:var(--amber);
-    border:none;
-    border-radius:10px;
-    padding:0 16px;
-    font-family:'Do Hyeon', sans-serif;
-    font-size:15px;
-    color:#ffffff;
-    cursor:pointer;
-  }
-  .add-row button:active{ transform:scale(.96); }
 
-  ul.todos{
-    list-style:none;
-    margin:14px 0 0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    max-height:220px;
-    overflow-y:auto;
+  .add-row input {
+    flex: 1;
+    background: #f9f8f6;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 11px 12px;
+    color: var(--ink);
+    font-size: 14px;
+    font-family: inherit;
   }
-  ul.todos:empty{ display:none; }
-  ul.todos li{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background:#f9f8f6;
-    border-radius:10px;
-    padding:9px 10px;
+
+  .add-row input::placeholder {
+    color: #999;
+  }
+
+  .add-row input:focus {
+    outline: none;
+    border-color: var(--amber);
+    background: #fff;
+  }
+
+  .add-row button {
+    background: var(--amber);
+    border: none;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 15px;
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  .add-row button:active {
+    transform: scale(.96);
+  }
+
+  ul.todos {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  ul.todos:empty {
+    display: none;
+  }
+
+  ul.todos li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f9f8f6;
+    border-radius: 10px;
+    padding: 9px 10px;
     border: 1px solid #eee;
   }
-  ul.todos li .box{
-    width:20px; height:20px; flex:0 0 20px;
-    border-radius:6px;
-    border:2px solid var(--mint);
-    cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition:background .15s;
+
+  ul.todos li .box {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    border-radius: 6px;
+    border: 2px solid var(--mint);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
   }
-  ul.todos li.done .box{ background:var(--mint); }
-  ul.todos li .box svg{ width:12px; height:12px; opacity:0; }
-  ul.todos li.done .box svg{ opacity:1; }
-  ul.todos li span.txt{
-    flex:1; font-size:14px; word-break:break-all;
-    cursor:text;
+
+  ul.todos li.done .box {
+    background: var(--mint);
+  }
+
+  ul.todos li .box svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+  }
+
+  ul.todos li.done .box svg {
+    opacity: 1;
+  }
+
+  ul.todos li span.txt {
+    flex: 1;
+    font-size: 14px;
+    word-break: break-all;
+    cursor: text;
     color: var(--ink);
   }
-  ul.todos li.done span.txt{
-    text-decoration:line-through;
-    color:#888888;
-  }
-  ul.todos li input.edit-input{
-    flex:1; font-size:14px; font-family:inherit;
-    background:#fff;
-    border:1px solid var(--amber);
-    border-radius:6px;
-    color:var(--ink);
-    padding:3px 6px;
-  }
-  ul.todos li .edit{
-    background:none; border:none; color:#888;
-    cursor:pointer; font-size:14px; line-height:1;
-    padding:2px 4px;
-    opacity:0;
-    transition:opacity .15s;
-  }
-  ul.todos li:hover .edit{ opacity:1; }
-  ul.todos li .edit:hover{ color:var(--amber); }
-  ul.todos li .del{
-    background:none; border:none; color:#888;
-    cursor:pointer; font-size:16px; line-height:1;
-    padding:2px 4px;
-  }
-  ul.todos li .del:hover{ color:var(--danger); }
 
-  .empty-msg{
-    text-align:center;
-    font-size:13px;
-    color:#888;
-    padding:10px 0 2px;
+  ul.todos li.done span.txt {
+    text-decoration: line-through;
+    color: #888888;
   }
 
-  .progress-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:14px;
-  }
-  .progress-track{
-    flex:1;
-    height:8px;
-    background:#eee;
-    border-radius:5px;
-    overflow:hidden;
-  }
-  .progress-fill{
-    height:100%;
-    background:linear-gradient(90deg, var(--mint), var(--amber));
-    width:0%;
-    transition:width .4s ease;
-  }
-  .progress-label{
-    font-family:'Do Hyeon', sans-serif;
-    font-size:14px;
-    color:var(--amber);
-    min-width:38px;
-    text-align:right;
+  ul.todos li input.edit-input {
+    flex: 1;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    border: 1px solid var(--amber);
+    border-radius: 6px;
+    color: var(--ink);
+    padding: 3px 6px;
   }
 
-  /* ---- WALL ---- */
-  .wall-card{ padding:0; overflow:hidden; position:relative; }
-  .wall-head{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:14px 16px 0;
+  ul.todos li .edit {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 4px;
+    opacity: 0;
+    transition: opacity .15s;
   }
-  .wall-head .title{
-    font-family:'Do Hyeon', sans-serif;
-    font-size:15px;
-    color:var(--paper-dim);
+
+  ul.todos li:hover .edit {
+    opacity: 1;
   }
-  .wall-head-actions{
-    display:flex;
-    gap:6px;
+
+  ul.todos li .edit:hover {
+    color: var(--amber);
   }
-  .head-btn{
-    background:#f4f1ea;
-    border:1px solid #ddd;
-    border-radius:8px;
-    height:32px;
-    font-size:13px;
-    cursor:pointer;
-    color:var(--ink);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+
+  ul.todos li .del {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+
+  ul.todos li .del:hover {
+    color: var(--danger);
+  }
+
+  .empty-msg {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    padding: 10px 0 2px;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mint), var(--amber));
+    width: 0%;
+    transition: width .4s ease;
+  }
+
+  .progress-label {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    color: var(--amber);
+    min-width: 38px;
+    text-align: right;
+  }
+
+  /* WALL */
+
+  .wall-card {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .wall-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 0;
+  }
+
+  .wall-head .title {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 15px;
+    color: var(--paper-dim);
+  }
+
+  .wall-head-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .head-btn {
+    background: #f4f1ea;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    height: 32px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0 10px;
-    font-family:'Do Hyeon', sans-serif;
+    font-family: 'Do Hyeon', sans-serif;
   }
-  .head-btn:hover{
-    background:#eae5dc;
+
+  .head-btn:hover {
+    background: #eae5dc;
   }
 
   .theme-bar {
@@ -227,6 +310,7 @@
     padding: 10px 16px 0;
     overflow-x: auto;
   }
+
   .theme-btn {
     background: #f4f1ea;
     border: 1px solid #ddd;
@@ -238,10 +322,12 @@
     white-space: nowrap;
     transition: all 0.2s ease;
   }
+
   .theme-btn:hover {
     color: var(--ink);
     border-color: #bbb;
   }
+
   .theme-btn.active {
     background: var(--amber);
     color: #fff;
@@ -249,16 +335,16 @@
     border-color: var(--amber);
   }
 
-  .wall-stage{
-    position:relative;
-    margin:12px 16px 14px;
-    border-radius:12px;
-    overflow:hidden;
+  .wall-stage {
+    position: relative;
+    margin: 12px 16px 14px;
+    border-radius: 12px;
+    overflow: hidden;
     aspect-ratio: 4 / 3;
-    background:#111;
+    background: #111;
     box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
   }
-  
+
   .bg-image {
     position: absolute;
     inset: 0;
@@ -268,42 +354,55 @@
     transition: opacity 0.5s ease;
   }
 
-  .brick-grid{
-    position:absolute; inset:0;
-    display:grid;
+  .brick-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(6, 1fr);
   }
-  .brick{
+
+  .brick {
     background: linear-gradient(160deg, var(--brick-lt), var(--brick));
     border: 1px solid var(--mortar);
-    transform-origin:center;
-    transition: transform .55s cubic-bezier(.34,1.56,.64,1), opacity .5s ease;
+    transform-origin: center;
+    transition:
+      transform .55s cubic-bezier(.34,1.56,.64,1),
+      opacity .5s ease;
   }
-  .brick:nth-child(odd){ background: linear-gradient(160deg, var(--brick), var(--brick-dk)); }
-  .brick.gone{
-    opacity:0;
+
+  .brick:nth-child(odd) {
+    background: linear-gradient(160deg, var(--brick), var(--brick-dk));
+  }
+
+  .brick.gone {
+    opacity: 0;
     transform: scale(.15) rotate(35deg) translateY(30px);
-    pointer-events:none;
+    pointer-events: none;
   }
 
-  .wall-caption{
-    padding:0 16px 16px;
-    font-size:12.5px;
-    color:var(--paper-dim);
-    text-align:center;
+  .wall-caption {
+    padding: 0 16px 16px;
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    text-align: center;
   }
 
-  .msg-card{
-    display:none;
-    text-align:center;
-    padding:20px 16px;
+  .msg-card {
+    display: none;
+    text-align: center;
+    padding: 20px 16px;
     position: relative;
     color: var(--ink);
     background: #fff;
   }
-  .msg-card.show{ display:block; animation:pop .5s ease; }
-  .msg-close-btn{
+
+  .msg-card.show {
+    display: block;
+    animation: pop .5s ease;
+  }
+
+  .msg-close-btn {
     position: absolute;
     top: 10px;
     right: 12px;
@@ -314,79 +413,135 @@
     cursor: pointer;
     padding: 4px;
   }
-  .msg-close-btn:hover{ color: var(--ink); }
 
-  @keyframes pop{
-    0%{ transform:scale(.85); opacity:0; }
-    100%{ transform:scale(1); opacity:1; }
-  }
-  .msg-tag{
-    display:inline-block;
-    font-family:'Do Hyeon', sans-serif;
-    font-size:12px;
-    padding:3px 10px;
-    border-radius:20px;
-    margin-bottom:8px;
-  }
-  .msg-tag.cheer{ background:#e1f3ec; color:var(--mint); }
-  .msg-tag.savage{ background:#fae8e6; color:var(--danger); }
-  .msg-tag.reward{ background:#fef3d8; color:var(--amber); }
-  
-  .msg-text{
-    font-size:14.5px;
-    line-height:1.6;
-    margin:0 0 16px;
-    white-space: pre-line;
-  }
-  .msg-actions{
-    display:flex; gap:8px; justify-content:center;
-  }
-  .msg-actions button{
-    font-family:'Do Hyeon', sans-serif;
-    font-size:14px;
-    border-radius:10px;
-    padding:9px 14px;
-    cursor:pointer;
-    border:none;
-  }
-  .btn-next{ background:var(--amber); color:#fff; }
-  .btn-log{ background:#f4f1ea; color:var(--ink); border:1px solid #ddd !important; }
-
-  .modal-bg{
-    display:none;
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.5);
-    align-items:center; justify-content:center;
-    padding:20px;
-    z-index:50;
-  }
-  .modal-bg.show{ display:flex; }
-  .modal{
-    background:#ffffff;
-    border-radius:16px;
-    padding:20px;
-    width:100%; max-width:400px;
-    max-height:80vh;
-    overflow-y:auto;
-    box-shadow:var(--shadow);
+  .msg-close-btn:hover {
     color: var(--ink);
   }
-  .modal h2{
-    font-family:'Do Hyeon', sans-serif;
-    font-size:18px;
-    margin:0 0 4px;
-    color:var(--amber);
+
+  @keyframes pop {
+    0% {
+      transform: scale(.85);
+      opacity: 0;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
-  .modal p.sub{ margin:0 0 14px; font-size:12.5px; color:var(--paper-dim); }
-  .modal .close{
-    float:right;
-    background:none; border:none; color:var(--paper-dim);
-    font-size:20px; cursor:pointer;
+
+  .msg-tag {
+    display: inline-block;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
   }
-  .log-grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:12px;
+
+  .msg-tag.cheer {
+    background: #e1f3ec;
+    color: var(--mint);
+  }
+
+  .msg-tag.savage {
+    background: #fae8e6;
+    color: var(--danger);
+  }
+
+  .msg-tag.reward {
+    background: #fef3d8;
+    color: var(--amber);
+  }
+
+  .msg-text {
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    white-space: pre-line;
+  }
+
+  .msg-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .msg-actions button {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 14px;
+    border-radius: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-next {
+    background: var(--amber);
+    color: #fff;
+  }
+
+  .btn-log {
+    background: #f4f1ea;
+    color: var(--ink);
+    border: 1px solid #ddd !important;
+  }
+
+  /* MODAL */
+
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+
+  .modal-bg.show {
+    display: flex;
+  }
+
+  .modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    color: var(--ink);
+  }
+
+  .modal h2 {
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 18px;
+    margin: 0 0 4px;
+    color: var(--amber);
+  }
+
+  .modal p.sub {
+    margin: 0 0 14px;
+    font-size: 12.5px;
+    color: var(--paper-dim);
+  }
+
+  .modal .close {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--paper-dim);
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .log-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   .stamp-card {
@@ -401,12 +556,15 @@
     cursor: pointer;
     user-select: none;
     border: 1.5px dashed var(--stamp-border);
+
     box-shadow:
       0 0 0 6px var(--stamp-bg),
       0 4px 12px rgba(0, 0, 0, 0.1),
       0 1px 3px rgba(0, 0, 0, 0.05);
 
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+    transition:
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.25s ease;
   }
 
   .stamp-card:hover {
@@ -428,7 +586,6 @@
     object-fit: cover;
     border-radius: 2px;
     display: block;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
   }
 
   .stamp-date {
@@ -512,24 +669,48 @@
     font-family: 'Do Hyeon', sans-serif;
     cursor: pointer;
   }
-  .btn-delete-stamp:hover { opacity: 0.9; }
+
+  .btn-delete-stamp:hover {
+    opacity: 0.9;
+  }
 </style>
 </head>
+
 <body>
 
 <div class="app">
+
   <header>
     <h1>Wonder<span>Wall</span></h1>
     <p>할 일을 끝낼 때마다, 벽 너머 풍경이 조금씩 드러나요</p>
   </header>
 
   <div class="card wall-card">
+
     <div class="wall-head">
       <div class="title">🧱 벽 너머 풍경</div>
+
       <div class="wall-head-actions">
-        <button class="head-btn" id="notionLoginBtn" title="내 노션 계정 연동하기">🔗 노션연동</button>
-        <button class="head-btn" id="headerLogBtn" title="도감 보기">📖</button>
-        <button class="head-btn" id="soundBtn" title="효과음 켜기/끄기">🔊</button>
+        <button
+          class="head-btn"
+          id="notionLoginBtn"
+          title="내 노션 계정 연동하기">
+          🔗 노션연동
+        </button>
+
+        <button
+          class="head-btn"
+          id="headerLogBtn"
+          title="도감 보기">
+          📖
+        </button>
+
+        <button
+          class="head-btn"
+          id="soundBtn"
+          title="효과음 켜기/끄기">
+          🔊
+        </button>
       </div>
     </div>
 
@@ -542,550 +723,2459 @@
     </div>
 
     <div class="wall-stage" id="wallStage">
-      <img id="bgImage" class="bg-image" src="" alt="Wall Background Landscape" />
+      <img
+        id="bgImage"
+        class="bg-image"
+        src=""
+        alt="Wall Background Landscape"
+      />
+
       <div class="brick-grid" id="brickGrid"></div>
     </div>
-    <div class="wall-caption" id="wallCaption">벽돌 48개 · 할 일을 완료해서 하나씩 무너뜨려봐</div>
+
+    <div class="wall-caption" id="wallCaption">
+      벽돌 48개 · 할 일을 완료해서 하나씩 무너뜨려봐
+    </div>
 
     <div class="msg-card" id="msgCard">
-      <button class="msg-close-btn" id="msgCloseBtn" title="닫기">✕</button>
+
+      <button
+        class="msg-close-btn"
+        id="msgCloseBtn"
+        title="닫기">
+        ✕
+      </button>
+
       <div class="msg-tag" id="msgTag"></div>
+
       <p class="msg-text" id="msgText"></p>
+
       <div class="msg-actions">
-        <button class="btn-next" id="nextWallBtn">새 벽 쌓기</button>
-        <button class="btn-log" id="openLogBtn">도감 보기</button>
+        <button class="btn-next" id="nextWallBtn">
+          새 벽 쌓기
+        </button>
+
+        <button class="btn-log" id="openLogBtn">
+          도감 보기
+        </button>
       </div>
+
     </div>
+
   </div>
+
 
   <div class="card">
+
     <div class="add-row">
-      <input id="todoInput" type="text" placeholder="오늘 할 일을 적어봐" maxlength="60">
-      <button id="addBtn">추가</button>
+      <input
+        id="todoInput"
+        type="text"
+        placeholder="오늘 할 일을 적어봐"
+        maxlength="60"
+      >
+
+      <button id="addBtn">
+        추가
+      </button>
     </div>
+
     <ul class="todos" id="todoList"></ul>
-    <div class="empty-msg" id="emptyMsg">할 일을 추가하면 벽돌이 무너지기 시작해요</div>
-    <div class="progress-row">
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-label" id="progressLabel">0%</div>
+
+    <div class="empty-msg" id="emptyMsg">
+      할 일을 추가하면 벽돌이 무너지기 시작해요
     </div>
+
+    <div class="progress-row">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="progress-label" id="progressLabel">
+        0%
+      </div>
+    </div>
+
   </div>
+
 </div>
+
+
+<!-- 도감 모달 -->
 
 <div class="modal-bg" id="logModal">
+
   <div class="modal">
-    <button class="close" id="closeLogBtn">×</button>
-    <h2>📖 발견한 풍경 도감</h2>
-    <p class="sub" id="logSub">아직 모은 풍경이 없어요</p>
+
+    <button class="close" id="closeLogBtn">
+      ×
+    </button>
+
+    <h2>
+      📖 발견한 풍경 도감
+    </h2>
+
+    <p class="sub" id="logSub">
+      아직 모은 풍경이 없어요
+    </p>
+
     <div class="log-grid" id="logGrid"></div>
+
   </div>
+
 </div>
 
+
+<!-- 풍경 상세 모달 -->
+
 <div class="stamp-modal-overlay" id="stampModal">
+
   <div class="stamp-modal">
+
     <img src="" alt="확대 풍경">
+
     <div class="stamp-modal-date"></div>
+
     <div class="stamp-modal-message"></div>
-    <button class="btn-delete-stamp" id="deleteStampBtn">🗑️ 이 사진 삭제하기</button>
+
+    <button
+      class="btn-delete-stamp"
+      id="deleteStampBtn">
+      🗑️ 이 사진 삭제하기
+    </button>
+
   </div>
+
 </div>
+
 
 <script>
 (function(){
-  // --- OAuth 토큰/DB 처리 로직 ---
+
+  /* =========================================================
+     1. NOTION OAuth 정보
+     ========================================================= */
+
   const urlParams = new URLSearchParams(window.location.search);
+
   const tokenParam = urlParams.get('notion_token');
   const dbParam = urlParams.get('notion_db');
   const errorParam = urlParams.get('notion_error');
 
+
   if (tokenParam) {
-    localStorage.setItem('wonderwall_notion_token', tokenParam);
+
+    localStorage.setItem(
+      'wonderwall_notion_token',
+      tokenParam
+    );
+
     if (dbParam) {
-      localStorage.setItem('wonderwall_notion_db', dbParam);
+      localStorage.setItem(
+        'wonderwall_notion_db',
+        dbParam
+      );
     }
-    window.history.replaceState({}, document.title, window.location.pathname);
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+
     if (dbParam) {
-      alert('노션 연동이 성공적으로 완료되었습니다! 🎉\n이제 할 일을 추가하면 내 노션으로 동기화됩니다.');
+
+      alert(
+        '노션 연동이 성공적으로 완료되었습니다! 🎉\n\n' +
+        '이제 위젯과 노션이 서로 연결됩니다.'
+      );
+
     } else {
-      alert('로그인은 됐지만 연결할 데이터베이스를 찾지 못했어요.\nNotion에서 "할 일" DB에 이 연동(Integration)을 먼저 추가해주세요.');
+
+      alert(
+        '로그인은 됐지만 연결할 데이터베이스를 찾지 못했어요.\n\n' +
+        'Notion에서 "할 일" DB에 이 연동(Integration)을 먼저 추가해주세요.'
+      );
+
     }
+
   } else if (errorParam) {
-    window.history.replaceState({}, document.title, window.location.pathname);
-    alert('노션 연동 중 문제가 발생했습니다: ' + errorParam);
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+
+    alert(
+      '노션 연동 중 문제가 발생했습니다: ' +
+      errorParam
+    );
+
   }
 
-  const userNotionToken = localStorage.getItem('wonderwall_notion_token');
-  const userNotionDb = localStorage.getItem('wonderwall_notion_db');
 
-  document.getElementById('notionLoginBtn').addEventListener('click', () => {
-    window.location.href = '/api/auth/login';
-  });
+  const userNotionToken =
+    localStorage.getItem('wonderwall_notion_token');
 
-  // --- 기존 WonderWall 기능 로직 ---
-  const PIXABAY_API_KEY = '57149296-9d10be9789526d423ac583461'; 
-  const FALLBACK_IMAGE = 'https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg';
+  const userNotionDb =
+    localStorage.getItem('wonderwall_notion_db');
 
-  const LS_TODOS = 'wonderwall_todos_v3';
-  const LS_SOUND = 'wonderwall_sound_v3';
-  const LS_LOG  = 'wonderwall_collection_v3';
-  const LS_IMAGE = 'wonderwall_current_img_v3';
-  const LS_THEME = 'wonderwall_theme_v3';
-  const LS_ORDER = 'wonderwall_order_v3';
-  const LS_REMOVED = 'wonderwall_removed_v3';
-  const LS_LAST_DATE = 'wonderwall_last_date_v3';
+
+  document
+    .getElementById('notionLoginBtn')
+    .addEventListener('click', () => {
+
+      window.location.href = '/api/auth/login';
+
+    });
+
+
+  /* =========================================================
+     2. 기본 설정
+     ========================================================= */
+
+  const PIXABAY_API_KEY =
+    '57149296-9d10be9789526d423ac583461';
+
+  const FALLBACK_IMAGE =
+    'https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg';
+
+
+  const LS_TODOS =
+    'wonderwall_todos_v3';
+
+  const LS_SOUND =
+    'wonderwall_sound_v3';
+
+  const LS_LOG =
+    'wonderwall_collection_v3';
+
+  const LS_IMAGE =
+    'wonderwall_current_img_v3';
+
+  const LS_THEME =
+    'wonderwall_theme_v3';
+
+  const LS_ORDER =
+    'wonderwall_order_v3';
+
+  const LS_REMOVED =
+    'wonderwall_removed_v3';
+
   const TOTAL_BRICKS = 48;
 
+
   const THEME_CONFIG = {
-    photo: { q: 'landscape,nature', type: 'photo' },
-    pixel: { q: 'pixel art', type: 'illustration' },
-    illustration: { q: 'fantasy landscape,illustration', type: 'illustration' },
-    pattern: { q: 'abstract pattern,texture', type: 'all' },
-    '3d': { q: 'miniature diorama', type: 'illustration' }
+
+    photo: {
+      q: 'landscape,nature',
+      type: 'photo'
+    },
+
+    pixel: {
+      q: 'pixel art',
+      type: 'illustration'
+    },
+
+    illustration: {
+      q: 'fantasy landscape,illustration',
+      type: 'illustration'
+    },
+
+    pattern: {
+      q: 'abstract pattern,texture',
+      type: 'all'
+    },
+
+    '3d': {
+      q: 'miniature diorama',
+      type: 'illustration'
+    }
+
   };
+
 
   const messages = {
-    cheer: ['오늘 몫을 다 해냈어. 잘했어, 진짜로.', '벽 하나를 통째로 무너뜨렸네. 오늘 좀 멋진데?', '수고했어! 이제 오늘 남은 시간은 전부 네 거야.'],
-    savage: ['드디어 다 했네. 미루느라 유튜브 본 거 다 알아.', '했으니까 됐다! 과정의 딴짓은 묻지 않을게.', '시작하기까지 3시간, 만드는 데 15분. 아무튼 완수!'],
-    reward: ['풍경 조각 획득! 오늘의 멋진 장면이 수집함에 담겼어.', '새로운 풍경 카드가 도감에 저장되었어. 뿌듯하지?', '오늘의 미션 클리어! 풍경 수집률이 1 상승했습니다.']
+
+    cheer: [
+      '오늘 몫을 다 해냈어. 잘했어, 진짜로.',
+      '벽 하나를 통째로 무너뜨렸네. 오늘 좀 멋진데?',
+      '수고했어! 이제 오늘 남은 시간은 전부 네 거야.'
+    ],
+
+    savage: [
+      '드디어 다 했네. 미루느라 유튜브 본 거 다 알아.',
+      '했으니까 됐다! 과정의 딴짓은 묻지 않을게.',
+      '시작하기까지 3시간, 만드는 데 15분. 아무튼 완수!'
+    ],
+
+    reward: [
+      '풍경 조각 획득! 오늘의 멋진 장면이 수집함에 담겼어.',
+      '새로운 풍경 카드가 도감에 저장되었어. 뿌듯하지?',
+      '오늘의 미션 클리어! 풍경 수집률이 1 상승했습니다.'
+    ]
+
   };
 
-  let todos = JSON.parse(localStorage.getItem(LS_TODOS) || '[]');
-  let soundOn = localStorage.getItem(LS_SOUND) !== 'off';
-  let collection = JSON.parse(localStorage.getItem(LS_LOG) || '[]');
-  let currentImgUrl = localStorage.getItem(LS_IMAGE) || '';
-  let currentTheme = localStorage.getItem(LS_THEME) || 'photo';
-  let order = JSON.parse(localStorage.getItem(LS_ORDER) || 'null');
-  let removedCount = parseInt(localStorage.getItem(LS_REMOVED) || '0', 10);
-  let celebrated = removedCount >= TOTAL_BRICKS;
+
+  /* =========================================================
+     3. 로컬 상태
+     ========================================================= */
+
+  let todos =
+    JSON.parse(
+      localStorage.getItem(LS_TODOS) || '[]'
+    );
+
+
+  let soundOn =
+    localStorage.getItem(LS_SOUND) !== 'off';
+
+
+  let collection =
+    JSON.parse(
+      localStorage.getItem(LS_LOG) || '[]'
+    );
+
+
+  let currentImgUrl =
+    localStorage.getItem(LS_IMAGE) || '';
+
+
+  let currentTheme =
+    localStorage.getItem(LS_THEME) || 'photo';
+
+
+  let order =
+    JSON.parse(
+      localStorage.getItem(LS_ORDER) || 'null'
+    );
+
+
+  let removedCount =
+    parseInt(
+      localStorage.getItem(LS_REMOVED) || '0',
+      10
+    );
+
+
+  let celebrated =
+    removedCount >= TOTAL_BRICKS;
+
+
   let viewingIndex = null;
 
-  // 아직 Notion에 생성 요청이 진행 중인 할 일들을 추적함.
+
+  /*
+   * 새 할 일을 Notion에 생성하는 동안
+   * 체크를 눌러도 순서가 꼬이지 않도록 관리
+   */
   const pendingNotionCreates = new Map();
 
-  if(!order){ order = shuffledOrder(); localStorage.setItem(LS_ORDER, JSON.stringify(order)); }
 
-  function shuffledOrder(){
-    const arr = Array.from({length: TOTAL_BRICKS}, (_,i)=>i);
-    for(let i=arr.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [arr[i],arr[j]] = [arr[j],arr[i]];
-    }
-    return arr;
-  }
+  /*
+   * Notion에서 데이터를 불러오는 중인지 표시
+   */
+  let isLoadingFromNotion = false;
 
-  function resetWallAndTodos() {
-    fetchRandomLandscape(true);
+
+  /*
+   * 노션 연동 여부
+   */
+  const notionConnected =
+    !!(userNotionToken && userNotionDb);
+
+
+  if (!order) {
+
     order = shuffledOrder();
-    localStorage.setItem(LS_ORDER, JSON.stringify(order));
-    removedCount = 0;
-    localStorage.setItem(LS_REMOVED, '0');
-    todos = [];
-    saveTodos();
-    celebrated = false;
+
+    localStorage.setItem(
+      LS_ORDER,
+      JSON.stringify(order)
+    );
+
   }
 
-  function checkDailyReset() {
-    const todayStr = new Date().toDateString();
-    const lastDate = localStorage.getItem(LS_LAST_DATE);
 
-    if (lastDate && lastDate !== todayStr) {
-      resetWallAndTodos();
+  function shuffledOrder() {
+
+    const arr =
+      Array.from(
+        { length: TOTAL_BRICKS },
+        (_, i) => i
+      );
+
+    for (
+      let i = arr.length - 1;
+      i > 0;
+      i--
+    ) {
+
+      const j =
+        Math.floor(
+          Math.random() * (i + 1)
+        );
+
+      [arr[i], arr[j]] =
+        [arr[j], arr[i]];
+
     }
-    localStorage.setItem(LS_LAST_DATE, todayStr);
+
+    return arr;
+
   }
 
-  checkDailyReset();
 
-  const bgImageEl = document.getElementById('bgImage');
+  /* =========================================================
+     4. Notion API 통신
+     ========================================================= */
 
-  async function fetchRandomLandscape(forceNew = false){
-    if(currentImgUrl && !forceNew){
-      bgImageEl.src = currentImgUrl;
+
+  /*
+   * ⭐ 핵심
+   *
+   * Notion → 위젯
+   *
+   * 페이지를 열었을 때 Notion DB를 읽어온다.
+   */
+  async function loadTodosFromNotion() {
+
+    if (!notionConnected) {
       return;
     }
-    
-    const config = THEME_CONFIG[currentTheme] || THEME_CONFIG.photo;
-    const page = Math.floor(Math.random() * 3) + 1;
-    const url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(config.q)}&image_type=${config.type}&orientation=horizontal&per_page=20&page=${page}&safesearch=true`;
+
+    isLoadingFromNotion = true;
 
     try {
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Pixabay API Fetch Failed');
-      const data = await res.json();
-      
-      if (data.hits && data.hits.length > 0) {
-        const randomIndex = Math.floor(Math.random() * data.hits.length);
-        currentImgUrl = data.hits[randomIndex].webformatURL || data.hits[randomIndex].largeImageURL;
-      } else {
-        throw new Error('No images found');
+
+      const params = new URLSearchParams({
+
+        notionToken: userNotionToken,
+
+        notionDb: userNotionDb
+
+      });
+
+
+      const res =
+        await fetch(
+          `/api/notion?${params.toString()}`
+        );
+
+
+      const result =
+        await res.json();
+
+
+      if (!res.ok || !result.success) {
+
+        console.error(
+          'Notion 불러오기 실패:',
+          result
+        );
+
+        return;
+
       }
-    } catch(err) {
-      console.warn('Fallback Image used due to Pixabay API issue.', err);
-      currentImgUrl = FALLBACK_IMAGE;
+
+
+      /*
+       * Notion에서 받은 데이터를
+       * 위젯의 todos 배열에 그대로 넣는다.
+       */
+      todos =
+        (result.todos || []).map(t => ({
+
+          id: t.id,
+
+          text: t.text || '',
+
+          completed: !!t.completed,
+
+          notionPageId:
+            t.notionPageId || t.id
+
+        }));
+
+
+      saveTodos();
+
+      renderTodos();
+
+      console.log(
+        '✅ Notion → Widget 동기화 완료',
+        todos
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Notion 데이터 불러오기 오류:',
+        error
+      );
+
+    } finally {
+
+      isLoadingFromNotion = false;
+
     }
-    
-    localStorage.setItem(LS_IMAGE, currentImgUrl);
-    bgImageEl.src = currentImgUrl;
+
   }
+
+
+  /*
+   * 위젯 → Notion
+   *
+   * POST:
+   * 새로운 할 일 생성
+   *
+   * PATCH:
+   * 기존 할 일 수정
+   */
+  async function syncToNotion(
+    taskText,
+    isDone,
+    pageId
+  ) {
+
+    if (!notionConnected) {
+
+      console.warn(
+        '노션 연동이 아직 되어있지 않습니다.'
+      );
+
+      return null;
+
+    }
+
+
+    try {
+
+      const method =
+        pageId ? 'PATCH' : 'POST';
+
+
+      const res =
+        await fetch(
+          '/api/notion',
+          {
+
+            method,
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body: JSON.stringify({
+
+              task: taskText,
+
+              done: isDone,
+
+              pageId:
+                pageId || null,
+
+              notionToken:
+                userNotionToken,
+
+              notionDb:
+                userNotionDb
+
+            })
+
+          }
+        );
+
+
+      const result =
+        await res.json();
+
+
+      if (!res.ok) {
+
+        console.error(
+          'Notion 동기화 실패:',
+          result
+        );
+
+        return null;
+
+      }
+
+
+      return result;
+
+    } catch (error) {
+
+      console.error(
+        'Notion sync failed:',
+        error
+      );
+
+      return null;
+
+    }
+
+  }
+
+
+  /*
+   * ⭐ Notion 페이지 삭제
+   *
+   * 위젯에서 X를 눌렀을 때 사용
+   */
+  async function deleteFromNotion(pageId) {
+
+    if (
+      !notionConnected ||
+      !pageId
+    ) {
+      return null;
+    }
+
+
+    try {
+
+      const res =
+        await fetch(
+          '/api/notion',
+          {
+
+            method: 'DELETE',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body: JSON.stringify({
+
+              pageId,
+
+              notionToken:
+                userNotionToken,
+
+              notionDb:
+                userNotionDb
+
+            })
+
+          }
+        );
+
+
+      const result =
+        await res.json();
+
+
+      if (!res.ok) {
+
+        console.error(
+          'Notion 삭제 실패:',
+          result
+        );
+
+        return null;
+
+      }
+
+
+      console.log(
+        '✅ Notion 페이지 삭제 완료'
+      );
+
+
+      return result;
+
+    } catch (error) {
+
+      console.error(
+        'Notion delete failed:',
+        error
+      );
+
+      return null;
+
+    }
+
+  }
+
+
+  /*
+   * 새 할 일을 생성하는 동안 체크했을 경우
+   *
+   * 생성 완료 → 체크 상태 업데이트
+   */
+  async function syncCheckAfterCreate(t) {
+
+    const pending =
+      pendingNotionCreates.get(t.id);
+
+
+    if (pending) {
+
+      await pending;
+
+    }
+
+
+    if (!t.notionPageId) {
+      return;
+    }
+
+
+    await syncToNotion(
+      t.text,
+      t.completed,
+      t.notionPageId
+    );
+
+  }
+
+
+  /* =========================================================
+     5. 로컬 저장
+     ========================================================= */
+
+  function saveTodos() {
+
+    localStorage.setItem(
+      LS_TODOS,
+      JSON.stringify(todos)
+    );
+
+  }
+
+
+  /* =========================================================
+     6. 벽 초기화
+     ========================================================= */
+
+  function resetWallOnly() {
+
+    fetchRandomLandscape(true);
+
+    order = shuffledOrder();
+
+    localStorage.setItem(
+      LS_ORDER,
+      JSON.stringify(order)
+    );
+
+    removedCount = 0;
+
+    localStorage.setItem(
+      LS_REMOVED,
+      '0'
+    );
+
+    celebrated = false;
+
+  }
+
+
+  /* =========================================================
+     7. 이미지
+     ========================================================= */
+
+  const bgImageEl =
+    document.getElementById('bgImage');
+
+
+  async function fetchRandomLandscape(
+    forceNew = false
+  ) {
+
+    if (
+      currentImgUrl &&
+      !forceNew
+    ) {
+
+      bgImageEl.src =
+        currentImgUrl;
+
+      return;
+
+    }
+
+
+    const config =
+      THEME_CONFIG[currentTheme] ||
+      THEME_CONFIG.photo;
+
+
+    const page =
+      Math.floor(
+        Math.random() * 3
+      ) + 1;
+
+
+    const url =
+      `https://pixabay.com/api/?key=${PIXABAY_API_KEY}` +
+      `&q=${encodeURIComponent(config.q)}` +
+      `&image_type=${config.type}` +
+      `&orientation=horizontal` +
+      `&per_page=20` +
+      `&page=${page}` +
+      `&safesearch=true`;
+
+
+    try {
+
+      const res =
+        await fetch(url);
+
+
+      if (!res.ok) {
+        throw new Error(
+          'Pixabay API Fetch Failed'
+        );
+      }
+
+
+      const data =
+        await res.json();
+
+
+      if (
+        data.hits &&
+        data.hits.length > 0
+      ) {
+
+        const randomIndex =
+          Math.floor(
+            Math.random() *
+            data.hits.length
+          );
+
+
+        currentImgUrl =
+          data.hits[randomIndex].webformatURL ||
+          data.hits[randomIndex].largeImageURL;
+
+      } else {
+
+        throw new Error(
+          'No images found'
+        );
+
+      }
+
+    } catch (err) {
+
+      console.warn(
+        'Fallback Image used.',
+        err
+      );
+
+      currentImgUrl =
+        FALLBACK_IMAGE;
+
+    }
+
+
+    localStorage.setItem(
+      LS_IMAGE,
+      currentImgUrl
+    );
+
+
+    bgImageEl.src =
+      currentImgUrl;
+
+  }
+
+
+  /* =========================================================
+     8. 사운드
+     ========================================================= */
 
   let audioCtx = null;
-  function getCtx(){
-    if(!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    if(audioCtx.state === 'suspended') { audioCtx.resume(); }
+
+
+  function getCtx() {
+
+    if (!audioCtx) {
+
+      audioCtx =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+
+    if (
+      audioCtx.state ===
+      'suspended'
+    ) {
+
+      audioCtx.resume();
+
+    }
+
+
     return audioCtx;
+
   }
-  window.addEventListener('click', ()=> getCtx(), { once: true });
+
+
+  window.addEventListener(
+    'click',
+    () => getCtx(),
+    { once: true }
+  );
+
 
   function playCrumble() {
-    if (!soundOn) return;
+
+    if (!soundOn) {
+      return;
+    }
+
+
     try {
-      const ctx = getCtx();
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(280, now);
-      osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
-      oscGain.gain.setValueAtTime(0.8, now);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+      const ctx =
+        getCtx();
+
+      const now =
+        ctx.currentTime;
+
+
+      const osc =
+        ctx.createOscillator();
+
+      const oscGain =
+        ctx.createGain();
+
+
+      osc.type =
+        'triangle';
+
+      osc.frequency.setValueAtTime(
+        280,
+        now
+      );
+
+      osc.frequency.exponentialRampToValueAtTime(
+        40,
+        now + 0.08
+      );
+
+
+      oscGain.gain.setValueAtTime(
+        0.8,
+        now
+      );
+
+      oscGain.gain.exponentialRampToValueAtTime(
+        0.01,
+        now + 0.08
+      );
+
+
       osc.connect(oscGain);
-      oscGain.connect(ctx.destination);
+
+      oscGain.connect(
+        ctx.destination
+      );
+
+
       osc.start(now);
-      osc.stop(now + 0.08);
-    } catch(e){}
+
+      osc.stop(
+        now + 0.08
+      );
+
+    } catch(e) {}
+
   }
+
 
   function playAchieve() {
-    if (!soundOn) return;
+
+    if (!soundOn) {
+      return;
+    }
+
+
     try {
-      const ctx = getCtx();
-      const now = ctx.currentTime;
-      [659.25, 783.99, 987.77, 1174.66, 1567.98].forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-        gain.gain.setValueAtTime(0, now + idx * 0.07);
-        gain.gain.linearRampToValueAtTime(0.35, now + idx * 0.07 + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.3);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + idx * 0.07);
-        osc.stop(now + idx * 0.07 + 0.3);
-      });
-    } catch(e){}
+
+      const ctx =
+        getCtx();
+
+      const now =
+        ctx.currentTime;
+
+
+      [
+        659.25,
+        783.99,
+        987.77,
+        1174.66,
+        1567.98
+      ].forEach(
+        (freq, idx) => {
+
+          const osc =
+            ctx.createOscillator();
+
+          const gain =
+            ctx.createGain();
+
+
+          osc.type =
+            'sine';
+
+          osc.frequency.setValueAtTime(
+            freq,
+            now + idx * 0.07
+          );
+
+
+          gain.gain.setValueAtTime(
+            0,
+            now + idx * 0.07
+          );
+
+
+          gain.gain.linearRampToValueAtTime(
+            0.35,
+            now + idx * 0.07 + 0.015
+          );
+
+
+          gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            now + idx * 0.07 + 0.3
+          );
+
+
+          osc.connect(gain);
+
+          gain.connect(
+            ctx.destination
+          );
+
+
+          osc.start(
+            now + idx * 0.07
+          );
+
+          osc.stop(
+            now + idx * 0.07 + 0.3
+          );
+
+        }
+      );
+
+    } catch(e) {}
+
   }
 
-  const todoInput = document.getElementById('todoInput');
-  const addBtn = document.getElementById('addBtn');
-  const todoListEl = document.getElementById('todoList');
-  const emptyMsg = document.getElementById('emptyMsg');
-  const progressFill = document.getElementById('progressFill');
-  const progressLabel = document.getElementById('progressLabel');
-  const brickGrid = document.getElementById('brickGrid');
-  const soundBtn = document.getElementById('soundBtn');
-  const headerLogBtn = document.getElementById('headerLogBtn');
-  const wallCaption = document.getElementById('wallCaption');
-  const msgCard = document.getElementById('msgCard');
-  const msgCloseBtn = document.getElementById('msgCloseBtn');
-  const msgTag = document.getElementById('msgTag');
-  const msgText = document.getElementById('msgText');
-  const nextWallBtn = document.getElementById('nextWallBtn');
-  const openLogBtn = document.getElementById('openLogBtn');
-  const logModal = document.getElementById('logModal');
-  const closeLogBtn = document.getElementById('closeLogBtn');
-  const logGrid = document.getElementById('logGrid');
-  const logSub = document.getElementById('logSub');
 
-  soundBtn.textContent = soundOn ? '🔊' : '🔇';
+  /* =========================================================
+     9. DOM
+     ========================================================= */
 
-  const themeBtns = document.querySelectorAll('.theme-btn');
+  const todoInput =
+    document.getElementById(
+      'todoInput'
+    );
+
+  const addBtn =
+    document.getElementById(
+      'addBtn'
+    );
+
+  const todoListEl =
+    document.getElementById(
+      'todoList'
+    );
+
+  const emptyMsg =
+    document.getElementById(
+      'emptyMsg'
+    );
+
+  const progressFill =
+    document.getElementById(
+      'progressFill'
+    );
+
+  const progressLabel =
+    document.getElementById(
+      'progressLabel'
+    );
+
+  const brickGrid =
+    document.getElementById(
+      'brickGrid'
+    );
+
+  const soundBtn =
+    document.getElementById(
+      'soundBtn'
+    );
+
+  const headerLogBtn =
+    document.getElementById(
+      'headerLogBtn'
+    );
+
+  const wallCaption =
+    document.getElementById(
+      'wallCaption'
+    );
+
+  const msgCard =
+    document.getElementById(
+      'msgCard'
+    );
+
+  const msgCloseBtn =
+    document.getElementById(
+      'msgCloseBtn'
+    );
+
+  const msgTag =
+    document.getElementById(
+      'msgTag'
+    );
+
+  const msgText =
+    document.getElementById(
+      'msgText'
+    );
+
+  const nextWallBtn =
+    document.getElementById(
+      'nextWallBtn'
+    );
+
+  const openLogBtn =
+    document.getElementById(
+      'openLogBtn'
+    );
+
+  const logModal =
+    document.getElementById(
+      'logModal'
+    );
+
+  const closeLogBtn =
+    document.getElementById(
+      'closeLogBtn'
+    );
+
+  const logGrid =
+    document.getElementById(
+      'logGrid'
+    );
+
+  const logSub =
+    document.getElementById(
+      'logSub'
+    );
+
+
+  soundBtn.textContent =
+    soundOn ? '🔊' : '🔇';
+
+
+  /* =========================================================
+     10. 테마
+     ========================================================= */
+
+  const themeBtns =
+    document.querySelectorAll(
+      '.theme-btn'
+    );
+
+
   themeBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.theme === currentTheme);
-    btn.addEventListener('click', () => {
-      themeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentTheme = btn.dataset.theme;
-      localStorage.setItem(LS_THEME, currentTheme);
-      fetchRandomLandscape(true); 
-    });
+
+    btn.classList.toggle(
+      'active',
+      btn.dataset.theme ===
+      currentTheme
+    );
+
+
+    btn.addEventListener(
+      'click',
+      () => {
+
+        themeBtns.forEach(
+          b =>
+            b.classList.remove(
+              'active'
+            )
+        );
+
+
+        btn.classList.add(
+          'active'
+        );
+
+
+        currentTheme =
+          btn.dataset.theme;
+
+
+        localStorage.setItem(
+          LS_THEME,
+          currentTheme
+        );
+
+
+        fetchRandomLandscape(true);
+
+      }
+    );
+
   });
 
-  for(let i=0;i<TOTAL_BRICKS;i++){
-    const b = document.createElement('div');
-    b.className = 'brick';
-    b.dataset.idx = i;
-    if(order.indexOf(i) < removedCount){ b.classList.add('gone'); }
+
+  /* =========================================================
+     11. 벽돌
+     ========================================================= */
+
+  for (
+    let i = 0;
+    i < TOTAL_BRICKS;
+    i++
+  ) {
+
+    const b =
+      document.createElement(
+        'div'
+      );
+
+
+    b.className =
+      'brick';
+
+
+    b.dataset.idx =
+      i;
+
+
+    if (
+      order.indexOf(i) <
+      removedCount
+    ) {
+
+      b.classList.add(
+        'gone'
+      );
+
+    }
+
+
     brickGrid.appendChild(b);
-  }
-  const brickEls = Array.from(brickGrid.children);
 
-  function saveTodos(){ localStorage.setItem(LS_TODOS, JSON.stringify(todos)); }
-
-  // 노션 서버로 데이터 전송. pageId가 있으면 업데이트, 없으면 새로 생성.
-  async function syncToNotion(taskText, isDone, pageId) {
-    if (!userNotionToken || !userNotionDb) {
-      console.warn("노션 연동이 아직 안 되어있습니다.");
-      return null;
-    }
-    try {
-      const res = await fetch('/api/notion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          task: taskText,
-          done: isDone,
-          pageId: pageId || null,
-          notionToken: userNotionToken,
-          notionDb: userNotionDb
-        })
-      });
-      return await res.json();
-    } catch (err) {
-      console.error('Notion sync failed:', err);
-      return null;
-    }
   }
 
-  // 체크할 때, 그 할 일이 아직 Notion에 생성되는 중이면 끝날 때까지 기다렸다가 업데이트
-  async function syncCheckAfterCreate(t){
-    const pending = pendingNotionCreates.get(t.id);
-    if (pending) await pending;
-    syncToNotion(t.text, t.completed, t.notionPageId);
-  }
 
-  function renderTodos(){
-    todoListEl.innerHTML = '';
-    if(todos.length === 0){
-      emptyMsg.style.display = 'block';
-    } else {
-      emptyMsg.style.display = 'none';
-      todos.forEach(t=>{
-        const li = document.createElement('li');
-        li.className = t.completed ? 'done' : '';
-        li.innerHTML = `
-          <div class="box" data-id="${t.id}">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <span class="txt" data-id="${t.id}">${escapeHtml(t.text)}</span>
-          <button class="edit" data-id="${t.id}" title="수정">✎</button>
-          <button class="del" data-id="${t.id}">✕</button>
-        `;
-        todoListEl.appendChild(li);
-      });
-    }
-    updateProgress();
-  }
+  const brickEls =
+    Array.from(
+      brickGrid.children
+    );
 
-  function escapeHtml(str){
-    const d = document.createElement('div');
-    d.textContent = str;
+
+  /* =========================================================
+     12. Todo 렌더링
+     ========================================================= */
+
+  function escapeHtml(str) {
+
+    const d =
+      document.createElement(
+        'div'
+      );
+
+    d.textContent =
+      str;
+
     return d.innerHTML;
+
   }
 
-  function updateProgress(){
-    const total = todos.length;
-    const done = todos.filter(t=>t.completed).length;
-    const percent = total === 0 ? 0 : Math.round((done/total)*100);
-    progressFill.style.width = percent + '%';
-    progressLabel.textContent = percent + '%';
 
-    const targetRemoved = Math.floor((percent/100) * TOTAL_BRICKS);
-    let messageDelay = 500;
-    if(targetRemoved > removedCount){
-      const toRemove = order.slice(removedCount, targetRemoved);
-      toRemove.forEach((brickIndex, i)=>{
-        setTimeout(()=>{
-          brickEls[brickIndex].classList.add('gone');
-          playCrumble();
-        }, i * 70);
-      });
-      messageDelay = Math.max(toRemove.length * 70 + 400, 650);
-      removedCount = targetRemoved;
-    } else if(targetRemoved < removedCount){
-      brickEls.forEach((el, idx)=>{
-        const shouldBeGone = order.indexOf(idx) < targetRemoved;
-        el.classList.toggle('gone', shouldBeGone);
-      });
-      removedCount = targetRemoved;
-    }
-    localStorage.setItem(LS_REMOVED, String(removedCount));
+  function renderTodos() {
 
-    wallCaption.textContent = total === 0
-      ? '벽돌 48개 · 할 일을 완료해서 하나씩 무너뜨려봐'
-      : `벽돌 ${TOTAL_BRICKS - removedCount}개 남음 · ${done}/${total} 완료`;
+    todoListEl.innerHTML =
+      '';
 
-    if(percent === 100 && total > 0 && !celebrated){
-      celebrated = true;
-      setTimeout(showMessage, messageDelay);
-    }
-    if(percent < 100){
-      celebrated = false;
-      msgCard.classList.remove('show');
-    }
-  }
 
-  function showMessage(){
-    playAchieve();
-    const types = ['cheer', 'savage', 'reward'];
-    const type = types[Math.floor(Math.random()*types.length)];
-    const pool = messages[type];
-    let baseText = pool[Math.floor(Math.random()*pool.length)];
-    
-    const d = new Date();
-    const todayKey = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-    const dateLabel = `${todayKey} #${collection.length + 1}`;
-    
-    const existingItem = collection.find(item => item.img === currentImgUrl);
-    
-    if (existingItem) {
-      const originalDate = existingItem.date.split(' ')[0];
-      msgTag.className = 'msg-tag reward';
-      msgTag.textContent = '이미 수집한 풍경';
-      msgText.textContent = `${originalDate}에 이미 수집한 풍경이에요.\n\n도감에는 추가되지 않았지만,\n오늘의 벽 부수기는 성공적으로 완료됐어요! 🎉\n\n${baseText}`;
+    if (
+      todos.length === 0
+    ) {
+
+      emptyMsg.style.display =
+        'block';
+
     } else {
-      msgTag.className = 'msg-tag ' + type;
-      msgTag.textContent = type === 'cheer' ? '응원형' : type === 'savage' ? '팩폭형' : '보상형';
-      msgText.textContent = baseText;
 
-      collection.push({ img: currentImgUrl, date: dateLabel, message: baseText });
-      localStorage.setItem(LS_LOG, JSON.stringify(collection));
-    }
+      emptyMsg.style.display =
+        'none';
 
-    msgCard.classList.add('show');
-  }
 
-  msgCloseBtn.addEventListener('click', ()=>{
-    msgCard.classList.remove('show');
-  });
+      todos.forEach(t => {
 
-  function addTodo(){
-    const val = todoInput.value.trim();
-    if(!val) return;
-    const newTodo = { id: Date.now()+Math.random(), text: val, completed: false, notionPageId: null };
-    todos.push(newTodo);
-    todoInput.value = '';
-    saveTodos(); renderTodos();
+        const li =
+          document.createElement(
+            'li'
+          );
 
-    const createPromise = syncToNotion(val, false).then(result => {
-      if(result && result.data && result.data.id){
-        newTodo.notionPageId = result.data.id;
-        saveTodos();
-      }
-      pendingNotionCreates.delete(newTodo.id);
-      return result;
-    });
-    pendingNotionCreates.set(newTodo.id, createPromise);
-  }
 
-  addBtn.addEventListener('click', addTodo);
-  todoInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) addTodo(); });
+        li.className =
+          t.completed
+            ? 'done'
+            : '';
 
-  todoListEl.addEventListener('click', e=>{
-    const box = e.target.closest('.box');
-    const del = e.target.closest('.del');
-    const editBtn = e.target.closest('.edit');
-    const txt = e.target.closest('.txt');
-    if(box){
-      const id = box.dataset.id;
-      const t = todos.find(x=> String(x.id) === id);
-      if(t){
-        t.completed = !t.completed;
-        saveTodos();
-        renderTodos();
-        syncCheckAfterCreate(t);
-      }
-    } else if(del){
-      todos = todos.filter(x=> String(x.id) !== del.dataset.id);
-      saveTodos(); renderTodos();
-    } else if(editBtn || txt){
-      startEdit((editBtn || txt).dataset.id);
-    }
-  });
 
-  function startEdit(id){
-    const t = todos.find(x=> String(x.id) === id);
-    if(!t) return;
-    const span = todoListEl.querySelector(`.txt[data-id="${id}"]`);
-    if(!span || span.tagName === 'INPUT') return;
-    const input = document.createElement('input');
-    input.type = 'text'; input.className = 'edit-input'; input.value = t.text;
-    span.replaceWith(input); input.focus(); input.select();
-    const commit = ()=>{ if(input.value.trim()) t.text = input.value.trim(); saveTodos(); renderTodos(); };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', e => { if(e.key==='Enter' && !e.isComposing) input.blur(); });
-  }
+        li.innerHTML = `
 
-  soundBtn.addEventListener('click', ()=>{
-    soundOn = !soundOn;
-    soundBtn.textContent = soundOn ? '🔊' : '🔇';
-    localStorage.setItem(LS_SOUND, soundOn ? 'on' : 'off');
-  });
+          <div
+            class="box"
+            data-id="${escapeHtml(String(t.id))}"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M4 12l5 5L20 6"
+                stroke="#fff"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
 
-  nextWallBtn.addEventListener('click', ()=>{
-    fetchRandomLandscape(true);
-    order = shuffledOrder();
-    localStorage.setItem(LS_ORDER, JSON.stringify(order));
-    removedCount = 0;
-    localStorage.setItem(LS_REMOVED, '0');
-    brickEls.forEach(el=> el.classList.remove('gone'));
-    todos = [];
-    saveTodos();
-    celebrated = false;
-    msgCard.classList.remove('show');
-    renderTodos();
-  });
+          <span
+            class="txt"
+            data-id="${escapeHtml(String(t.id))}"
+          >
+            ${escapeHtml(t.text)}
+          </span>
 
-  headerLogBtn.addEventListener('click', renderLog);
-  openLogBtn.addEventListener('click', renderLog);
-  closeLogBtn.addEventListener('click', ()=> logModal.classList.remove('show'));
+          <button
+            class="edit"
+            data-id="${escapeHtml(String(t.id))}"
+            title="수정"
+          >
+            ✎
+          </button>
 
-  function renderLog(){
-    logGrid.innerHTML = '';
-    if(collection.length === 0){
-      logSub.textContent = '아직 모은 풍경이 없어요';
-    } else {
-      logSub.textContent = `총 ${collection.length}개의 풍경을 모았어요`;
-      collection.slice().reverse().forEach((item, originalIndex)=>{
-        const actualIdx = collection.length - 1 - originalIndex;
-        const div = document.createElement('div');
-        div.className = 'stamp-card';
-        div.innerHTML = `
-          <img class="stamp-img" src="${item.img}" alt="Collection Scene"/>
-          <div class="stamp-date">${item.date}</div>
+          <button
+            class="del"
+            data-id="${escapeHtml(String(t.id))}"
+          >
+            ✕
+          </button>
+
         `;
-        div.addEventListener('click', () => {
-          viewingIndex = actualIdx;
-          const modal = document.getElementById('stampModal');
-          modal.querySelector('img').src = item.img;
-          modal.querySelector('.stamp-modal-date').innerText = item.date;
-          modal.querySelector('.stamp-modal-message').innerText = `"${item.message}"`;
-          modal.classList.add('active');
-        });
-        logGrid.appendChild(div);
+
+
+        todoListEl.appendChild(
+          li
+        );
+
       });
+
     }
-    logModal.classList.add('show');
+
+
+    updateProgress();
+
   }
 
-  document.getElementById('deleteStampBtn').addEventListener('click', () => {
-    if(viewingIndex !== null && viewingIndex >= 0 && viewingIndex < collection.length){
-      collection.splice(viewingIndex, 1);
-      localStorage.setItem(LS_LOG, JSON.stringify(collection));
-      document.getElementById('stampModal').classList.remove('active');
-      renderLog();
-    }
-  });
 
-  document.getElementById('stampModal').addEventListener('click', (e) => {
-    if(e.target === document.getElementById('stampModal')){
-      document.getElementById('stampModal').classList.remove('active');
+  /* =========================================================
+     13. 진행률
+     ========================================================= */
+
+  function updateProgress() {
+
+    const total =
+      todos.length;
+
+
+    const done =
+      todos.filter(
+        t => t.completed
+      ).length;
+
+
+    const percent =
+      total === 0
+        ? 0
+        : Math.round(
+            (done / total) * 100
+          );
+
+
+    progressFill.style.width =
+      percent + '%';
+
+
+    progressLabel.textContent =
+      percent + '%';
+
+
+    const targetRemoved =
+      Math.floor(
+        (percent / 100) *
+        TOTAL_BRICKS
+      );
+
+
+    let messageDelay =
+      500;
+
+
+    if (
+      targetRemoved >
+      removedCount
+    ) {
+
+      const toRemove =
+        order.slice(
+          removedCount,
+          targetRemoved
+        );
+
+
+      toRemove.forEach(
+        (brickIndex, i) => {
+
+          setTimeout(
+            () => {
+
+              brickEls[
+                brickIndex
+              ].classList.add(
+                'gone'
+              );
+
+              playCrumble();
+
+            },
+            i * 70
+          );
+
+        }
+      );
+
+
+      messageDelay =
+        Math.max(
+          toRemove.length * 70 + 400,
+          650
+        );
+
+
+      removedCount =
+        targetRemoved;
+
+
+    } else if (
+      targetRemoved <
+      removedCount
+    ) {
+
+      brickEls.forEach(
+        (el, idx) => {
+
+          const shouldBeGone =
+            order.indexOf(idx) <
+            targetRemoved;
+
+
+          el.classList.toggle(
+            'gone',
+            shouldBeGone
+          );
+
+        }
+      );
+
+
+      removedCount =
+        targetRemoved;
+
     }
-  });
+
+
+    localStorage.setItem(
+      LS_REMOVED,
+      String(removedCount)
+    );
+
+
+    wallCaption.textContent =
+      total === 0
+        ? '벽돌 48개 · 할 일을 완료해서 하나씩 무너뜨려봐'
+        : `벽돌 ${TOTAL_BRICKS - removedCount}개 남음 · ${done}/${total} 완료`;
+
+
+    if (
+      percent === 100 &&
+      total > 0 &&
+      !celebrated
+    ) {
+
+      celebrated = true;
+
+
+      setTimeout(
+        showMessage,
+        messageDelay
+      );
+
+    }
+
+
+    if (
+      percent < 100
+    ) {
+
+      celebrated = false;
+
+      msgCard.classList.remove(
+        'show'
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     14. 완료 메시지
+     ========================================================= */
+
+  function showMessage() {
+
+    playAchieve();
+
+
+    const types = [
+      'cheer',
+      'savage',
+      'reward'
+    ];
+
+
+    const type =
+      types[
+        Math.floor(
+          Math.random() *
+          types.length
+        )
+      ];
+
+
+    const pool =
+      messages[type];
+
+
+    const baseText =
+      pool[
+        Math.floor(
+          Math.random() *
+          pool.length
+        )
+      ];
+
+
+    const d =
+      new Date();
+
+
+    const todayKey =
+      `${d.getFullYear()}.` +
+      `${String(d.getMonth() + 1).padStart(2, '0')}.` +
+      `${String(d.getDate()).padStart(2, '0')}`;
+
+
+    const dateLabel =
+      `${todayKey} #${collection.length + 1}`;
+
+
+    const existingItem =
+      collection.find(
+        item =>
+          item.img ===
+          currentImgUrl
+      );
+
+
+    if (existingItem) {
+
+      const originalDate =
+        existingItem.date
+          .split(' ')[0];
+
+
+      msgTag.className =
+        'msg-tag reward';
+
+
+      msgTag.textContent =
+        '이미 수집한 풍경';
+
+
+      msgText.textContent =
+        `${originalDate}에 이미 수집한 풍경이에요.\n\n` +
+        `도감에는 추가되지 않았지만,\n` +
+        `오늘의 벽 부수기는 성공적으로 완료됐어요! 🎉\n\n` +
+        baseText;
+
+    } else {
+
+      msgTag.className =
+        'msg-tag ' + type;
+
+
+      msgTag.textContent =
+        type === 'cheer'
+          ? '응원형'
+          : type === 'savage'
+            ? '팩폭형'
+            : '보상형';
+
+
+      msgText.textContent =
+        baseText;
+
+
+      collection.push({
+
+        img:
+          currentImgUrl,
+
+        date:
+          dateLabel,
+
+        message:
+          baseText
+
+      });
+
+
+      localStorage.setItem(
+        LS_LOG,
+        JSON.stringify(collection)
+      );
+
+    }
+
+
+    msgCard.classList.add(
+      'show'
+    );
+
+  }
+
+
+  msgCloseBtn.addEventListener(
+    'click',
+    () => {
+
+      msgCard.classList.remove(
+        'show'
+      );
+
+    }
+  );
+
+
+  /* =========================================================
+     15. Todo 추가
+     ========================================================= */
+
+  function addTodo() {
+
+    const val =
+      todoInput.value.trim();
+
+
+    if (!val) {
+      return;
+    }
+
+
+    const newTodo = {
+
+      /*
+       * Notion과 연결되기 전
+       * 임시 위젯 ID
+       */
+      id:
+        Date.now() +
+        Math.random(),
+
+      text:
+        val,
+
+      completed:
+        false,
+
+      notionPageId:
+        null
+
+    };
+
+
+    todos.push(
+      newTodo
+    );
+
+
+    todoInput.value =
+      '';
+
+
+    saveTodos();
+
+    renderTodos();
+
+
+    /*
+     * Notion에 새 페이지 생성
+     */
+    const createPromise =
+      syncToNotion(
+        val,
+        false,
+        null
+      ).then(
+        result => {
+
+          if (
+            result &&
+            result.data &&
+            result.data.id
+          ) {
+
+            /*
+             * Notion 페이지 ID 저장
+             */
+            newTodo.notionPageId =
+              result.data.id;
+
+
+            /*
+             * 다음부터는
+             * 이 ID를 이용해서
+             * PATCH / DELETE
+             */
+            newTodo.id =
+              result.data.id;
+
+
+            saveTodos();
+
+            renderTodos();
+
+          }
+
+
+          pendingNotionCreates.delete(
+            newTodo.id
+          );
+
+
+          return result;
+
+        }
+      );
+
+
+    pendingNotionCreates.set(
+      newTodo.id,
+      createPromise
+    );
+
+  }
+
+
+  addBtn.addEventListener(
+    'click',
+    addTodo
+  );
+
+
+  todoInput.addEventListener(
+    'keydown',
+    e => {
+
+      if (
+        e.key === 'Enter' &&
+        !e.isComposing
+      ) {
+
+        addTodo();
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     16. 체크 / 수정 / 삭제
+     ========================================================= */
+
+  todoListEl.addEventListener(
+    'click',
+    async e => {
+
+      const box =
+        e.target.closest(
+          '.box'
+        );
+
+
+      const del =
+        e.target.closest(
+          '.del'
+        );
+
+
+      const editBtn =
+        e.target.closest(
+          '.edit'
+        );
+
+
+      const txt =
+        e.target.closest(
+          '.txt'
+        );
+
+
+      /* -----------------------------------------
+         체크
+         ----------------------------------------- */
+
+      if (box) {
+
+        const id =
+          box.dataset.id;
+
+
+        const t =
+          todos.find(
+            x =>
+              String(x.id) ===
+              String(id)
+          );
+
+
+        if (!t) {
+          return;
+        }
+
+
+        t.completed =
+          !t.completed;
+
+
+        saveTodos();
+
+        renderTodos();
+
+
+        await syncCheckAfterCreate(
+          t
+        );
+
+
+        return;
+
+      }
+
+
+      /* -----------------------------------------
+         삭제
+         ----------------------------------------- */
+
+      if (del) {
+
+        const id =
+          del.dataset.id;
+
+
+        const t =
+          todos.find(
+            x =>
+              String(x.id) ===
+              String(id)
+          );
+
+
+        if (!t) {
+          return;
+        }
+
+
+        /*
+         * 먼저 위젯에서 삭제
+         */
+        todos =
+          todos.filter(
+            x =>
+              String(x.id) !==
+              String(id)
+          );
+
+
+        saveTodos();
+
+        renderTodos();
+
+
+        /*
+         * 그리고 Notion에서도 삭제
+         */
+        if (t.notionPageId) {
+
+          await deleteFromNotion(
+            t.notionPageId
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* -----------------------------------------
+         * 수정
+         * ----------------------------------------- */
+
+      if (editBtn || txt) {
+
+        startEdit(
+          (editBtn || txt)
+            .dataset.id
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     17. Todo 수정
+     ========================================================= */
+
+  function startEdit(id) {
+
+    const t =
+      todos.find(
+        x =>
+          String(x.id) ===
+          String(id)
+      );
+
+
+    if (!t) {
+      return;
+    }
+
+
+    const span =
+      todoListEl.querySelector(
+        `.txt[data-id="${CSS.escape(String(id))}"]`
+      );
+
+
+    if (
+      !span ||
+      span.tagName === 'INPUT'
+    ) {
+      return;
+    }
+
+
+    const oldText =
+      t.text;
+
+
+    const input =
+      document.createElement(
+        'input'
+      );
+
+
+    input.type =
+      'text';
+
+
+    input.className =
+      'edit-input';
+
+
+    input.value =
+      t.text;
+
+
+    span.replaceWith(
+      input
+    );
+
+
+    input.focus();
+
+    input.select();
+
+
+    let committed =
+      false;
+
+
+    const commit =
+      async () => {
+
+        if (committed) {
+          return;
+        }
+
+
+        committed = true;
+
+
+        const newText =
+          input.value.trim();
+
+
+        /*
+         * 빈칸이면 원래 내용 유지
+         */
+        if (!newText) {
+
+          t.text =
+            oldText;
+
+        } else {
+
+          t.text =
+            newText;
+
+        }
+
+
+        saveTodos();
+
+        renderTodos();
+
+
+        /*
+         * ⭐ 제목이 바뀌었으므로
+         * Notion에도 PATCH
+         */
+        if (
+          t.notionPageId
+        ) {
+
+          await syncToNotion(
+
+            t.text,
+
+            t.completed,
+
+            t.notionPageId
+
+          );
+
+        }
+
+      };
+
+
+    input.addEventListener(
+      'blur',
+      commit
+    );
+
+
+    input.addEventListener(
+      'keydown',
+      e => {
+
+        if (
+          e.key === 'Enter' &&
+          !e.isComposing
+        ) {
+
+          input.blur();
+
+        }
+
+
+        if (
+          e.key === 'Escape'
+        ) {
+
+          committed = true;
+
+          renderTodos();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     18. 사운드
+     ========================================================= */
+
+  soundBtn.addEventListener(
+    'click',
+    () => {
+
+      soundOn =
+        !soundOn;
+
+
+      soundBtn.textContent =
+        soundOn
+          ? '🔊'
+          : '🔇';
+
+
+      localStorage.setItem(
+        LS_SOUND,
+        soundOn
+          ? 'on'
+          : 'off'
+      );
+
+    }
+  );
+
+
+  /* =========================================================
+     19. 새 벽
+     ========================================================= */
+
+  nextWallBtn.addEventListener(
+    'click',
+    () => {
+
+      /*
+       * 주의:
+       * 새 벽을 쌓아도 Notion DB의
+       * 할 일은 삭제하지 않는다.
+       *
+       * 양방향 동기화의 기준은 Notion DB이기 때문.
+       */
+
+      fetchRandomLandscape(true);
+
+
+      order =
+        shuffledOrder();
+
+
+      localStorage.setItem(
+        LS_ORDER,
+        JSON.stringify(order)
+      );
+
+
+      removedCount =
+        0;
+
+
+      localStorage.setItem(
+        LS_REMOVED,
+        '0'
+      );
+
+
+      brickEls.forEach(
+        el =>
+          el.classList.remove(
+            'gone'
+          )
+      );
+
+
+      celebrated =
+        false;
+
+
+      msgCard.classList.remove(
+        'show'
+      );
+
+
+      renderTodos();
+
+    }
+  );
+
+
+  /* =========================================================
+     20. 도감
+     ========================================================= */
+
+  headerLogBtn.addEventListener(
+    'click',
+    renderLog
+  );
+
+
+  openLogBtn.addEventListener(
+    'click',
+    renderLog
+  );
+
+
+  closeLogBtn.addEventListener(
+    'click',
+    () =>
+      logModal.classList.remove(
+        'show'
+      )
+  );
+
+
+  function renderLog() {
+
+    logGrid.innerHTML =
+      '';
+
+
+    if (
+      collection.length === 0
+    ) {
+
+      logSub.textContent =
+        '아직 모은 풍경이 없어요';
+
+    } else {
+
+      logSub.textContent =
+        `총 ${collection.length}개의 풍경을 모았어요`;
+
+
+      collection
+        .slice()
+        .reverse()
+        .forEach(
+          (item, originalIndex) => {
+
+            const actualIdx =
+              collection.length -
+              1 -
+              originalIndex;
+
+
+            const div =
+              document.createElement(
+                'div'
+              );
+
+
+            div.className =
+              'stamp-card';
+
+
+            div.innerHTML = `
+
+              <img
+                class="stamp-img"
+                src="${escapeHtml(item.img)}"
+                alt="Collection Scene"
+              >
+
+              <div class="stamp-date">
+                ${escapeHtml(item.date)}
+              </div>
+
+            `;
+
+
+            div.addEventListener(
+              'click',
+              () => {
+
+                viewingIndex =
+                  actualIdx;
+
+
+                const modal =
+                  document.getElementById(
+                    'stampModal'
+                  );
+
+
+                modal.querySelector(
+                  'img'
+                ).src =
+                  item.img;
+
+
+                modal.querySelector(
+                  '.stamp-modal-date'
+                ).innerText =
+                  item.date;
+
+
+                modal.querySelector(
+                  '.stamp-modal-message'
+                ).innerText =
+                  `"${item.message}"`;
+
+
+                modal.classList.add(
+                  'active'
+                );
+
+              }
+            );
+
+
+            logGrid.appendChild(
+              div
+            );
+
+          }
+        );
+
+    }
+
+
+    logModal.classList.add(
+      'show'
+    );
+
+  }
+
+
+  document
+    .getElementById(
+      'deleteStampBtn'
+    )
+    .addEventListener(
+      'click',
+      () => {
+
+        if (
+          viewingIndex !== null &&
+          viewingIndex >= 0 &&
+          viewingIndex <
+            collection.length
+        ) {
+
+          collection.splice(
+            viewingIndex,
+            1
+          );
+
+
+          localStorage.setItem(
+            LS_LOG,
+            JSON.stringify(
+              collection
+            )
+          );
+
+
+          document
+            .getElementById(
+              'stampModal'
+            )
+            .classList.remove(
+              'active'
+            );
+
+
+          renderLog();
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      'stampModal'
+    )
+    .addEventListener(
+      'click',
+      e => {
+
+        if (
+          e.target ===
+          document.getElementById(
+            'stampModal'
+          )
+        ) {
+
+          document
+            .getElementById(
+              'stampModal'
+            )
+            .classList.remove(
+              'active'
+            );
+
+        }
+
+      }
+    );
+
+
+  /* =========================================================
+     21. ⭐ 처음 실행
+     ========================================================= */
 
   fetchRandomLandscape();
+
+
+  /*
+   * 먼저 현재 로컬 데이터를 화면에 보여준다.
+   */
   renderTodos();
+
+
+  /*
+   * 그리고 Notion에 연결되어 있다면
+   * Notion 데이터를 가져와서 덮어쓴다.
+   *
+   * 이것이 "Notion → 위젯" 부분이다.
+   */
+  if (notionConnected) {
+
+    loadTodosFromNotion();
+
+  }
+
+
 })();
 </script>
+
 </body>
 </html>
