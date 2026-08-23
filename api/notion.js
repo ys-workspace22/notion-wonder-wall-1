@@ -78,40 +78,84 @@ export default async function handler(req, res) {
         });
       }
 
-      const todos = data.results.map(page => {
-        const props = page.properties || {};
-
-        // ------------------------------
-        // '할 일' 제목 가져오기
-        // ------------------------------
-        let taskText = '';
-
-        if (
-          props['할 일'] &&
-          props['할 일'].title &&
-          props['할 일'].title.length > 0
-        ) {
-          taskText = props['할 일'].title
-            .map(item => item.plain_text || '')
-            .join('');
-        }
-
-        // ------------------------------
-        // 'DONE' 체크박스 가져오기
-        // ------------------------------
-        const isDone =
-          props['DONE']?.checkbox === true;
-
-        return {
-          id: page.id,
-          text: taskText,
-          completed: isDone,
-          notionPageId: page.id,
-
-          // 나중에 최신 수정 시간 비교에 사용
-          lastEditedTime: page.last_edited_time
-        };
+      // --- [여기부터 교체된 부분입니다] ---
+      const today = new Date().toLocaleDateString('sv-SE', {
+        timeZone: 'Asia/Seoul'
       });
+      
+      const todos = await Promise.all(
+        data.results.map(async page => {
+          const props = page.properties || {};
+
+          // ------------------------------
+          // '할 일' 제목 가져오기
+          // ------------------------------
+          let taskText = '';
+
+          if (
+            props['할 일'] &&
+            props['할 일'].title &&
+            props['할 일'].title.length > 0
+          ) {
+            taskText = props['할 일'].title
+              .map(item => item.plain_text || '')
+              .join('');
+          }
+
+          // ------------------------------
+          // 'DONE' 체크박스 가져오기
+          // ------------------------------
+          const isDone =
+            props['DONE']?.checkbox === true;
+
+          // ------------------------------
+          // '날짜' 확인
+          // ------------------------------
+          const existingDate =
+            props['날짜']?.date?.start || null;
+
+          // 날짜가 비어 있으면 오늘 날짜 자동 입력
+          if (!existingDate && taskText.trim() !== '') {
+            try {
+              await fetch(
+                `https://api.notion.com/v1/pages/${page.id}`,
+                {
+                  method: 'PATCH',
+                  headers: {
+                    'Authorization': `Bearer ${AUTH_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Notion-Version': '2022-06-28'
+                  },
+                  body: JSON.stringify({
+                    properties: {
+                      '날짜': {
+                        date: {
+                          start: today
+                        }
+                      }
+                    }
+                  })
+                }
+              );
+            } catch (error) {
+              console.error(
+                '날짜 자동 입력 실패:',
+                error
+              );
+            }
+          }
+
+          return {
+            id: page.id,
+            text: taskText,
+            completed: isDone,
+            notionPageId: page.id,
+            date: existingDate || today,
+            lastEditedTime: page.last_edited_time
+          };
+        })
+      );
+      // --- [교체 끝] ---
 
       return res.status(200).json({
         success: true,
@@ -128,9 +172,7 @@ export default async function handler(req, res) {
   }
 
   // ==================================================
-  // 2. POST
-  // 위젯 → Notion
-  // 새로운 할 일 생성
+  // 2. POST (기존 그대로 유지)
   // ==================================================
   if (req.method === 'POST') {
     const {
@@ -213,9 +255,7 @@ export default async function handler(req, res) {
   }
 
   // ==================================================
-  // 3. PATCH
-  // 위젯 → Notion
-  // 체크 / 제목 수정
+  // 3. PATCH (기존 그대로 유지)
   // ==================================================
   if (req.method === 'PATCH') {
     const {
@@ -233,10 +273,6 @@ export default async function handler(req, res) {
     try {
       const properties = {};
 
-      // ------------------------------
-      // 제목 수정
-      // task가 전달된 경우에만 수정
-      // ------------------------------
       if (typeof task === 'string') {
         properties['할 일'] = {
           title: [
@@ -249,17 +285,12 @@ export default async function handler(req, res) {
         };
       }
 
-      // ------------------------------
-      // DONE 수정
-      // done이 전달된 경우에만 수정
-      // ------------------------------
       if (typeof done === 'boolean') {
         properties['DONE'] = {
           checkbox: done
         };
       }
 
-      // 아무것도 수정할 게 없는 경우
       if (Object.keys(properties).length === 0) {
         return res.status(400).json({
           error: 'Nothing to update.'
@@ -306,9 +337,7 @@ export default async function handler(req, res) {
   }
 
   // ==================================================
-  // 4. DELETE
-  // 위젯 → Notion
-  // 할 일 삭제
+  // 4. DELETE (기존 그대로 유지)
   // ==================================================
   if (req.method === 'DELETE') {
     const {
@@ -372,9 +401,6 @@ export default async function handler(req, res) {
     }
   }
 
-  // ==================================================
-  // 지원하지 않는 Method
-  // ==================================================
   return res.status(405).json({
     error: 'Method not allowed'
   });
