@@ -527,7 +527,6 @@
     <div class="wall-head">
       <div class="title">🧱 벽 너머 풍경</div>
       <div class="wall-head-actions">
-        <!-- 노션 연동 로그인 버튼 -->
         <button class="head-btn" id="notionLoginBtn" title="내 노션 계정 연동하기">🔗 노션연동</button>
         <button class="head-btn" id="headerLogBtn" title="도감 보기">📖</button>
         <button class="head-btn" id="soundBtn" title="효과음 켜기/끄기">🔊</button>
@@ -593,21 +592,31 @@
 
 <script>
 (function(){
-  // --- OAuth 토큰 처리 로직 ---
-  // 리다이렉트 후 URL에 notion_token 파라미터가 있으면 로컬 스토리지에 저장
+  // --- OAuth 토큰/DB 처리 로직 ---
   const urlParams = new URLSearchParams(window.location.search);
   const tokenParam = urlParams.get('notion_token');
+  const dbParam = urlParams.get('notion_db');
+  const errorParam = urlParams.get('notion_error');
+
   if (tokenParam) {
     localStorage.setItem('wonderwall_notion_token', tokenParam);
-    // URL에서 파라미터 숨기기 (깔끔하게 정리)
+    if (dbParam) {
+      localStorage.setItem('wonderwall_notion_db', dbParam);
+    }
     window.history.replaceState({}, document.title, window.location.pathname);
-    alert('노션 연동이 성공적으로 완료되었습니다! 🎉\n이제 할 일을 추가하면 내 노션으로 동기화됩니다.');
+    if (dbParam) {
+      alert('노션 연동이 성공적으로 완료되었습니다! 🎉\n이제 할 일을 추가하면 내 노션으로 동기화됩니다.');
+    } else {
+      alert('로그인은 됐지만 연결할 데이터베이스를 찾지 못했어요.\nNotion에서 "할 일" DB에 이 연동(Integration)을 먼저 추가해주세요.');
+    }
+  } else if (errorParam) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    alert('노션 연동 중 문제가 발생했습니다: ' + errorParam);
   }
-  
-  // 저장된 토큰 가져오기
-  const userNotionToken = localStorage.getItem('wonderwall_notion_token');
 
-  // 노션 연동 로그인 버튼 이벤트 (Vercel API로 이동)
+  const userNotionToken = localStorage.getItem('wonderwall_notion_token');
+  const userNotionDb = localStorage.getItem('wonderwall_notion_db');
+
   document.getElementById('notionLoginBtn').addEventListener('click', () => {
     window.location.href = '/api/auth/login';
   });
@@ -649,6 +658,9 @@
   let removedCount = parseInt(localStorage.getItem(LS_REMOVED) || '0', 10);
   let celebrated = removedCount >= TOTAL_BRICKS;
   let viewingIndex = null;
+
+  // 아직 Notion에 생성 요청이 진행 중인 할 일들을 추적함.
+  const pendingNotionCreates = new Map();
 
   if(!order){ order = shuffledOrder(); localStorage.setItem(LS_ORDER, JSON.stringify(order)); }
 
@@ -810,25 +822,36 @@
 
   function saveTodos(){ localStorage.setItem(LS_TODOS, JSON.stringify(todos)); }
 
-  // 노션 서버로 데이터 전송 시 발급받은 token도 함께 전송
-  async function syncToNotion(taskText, isDone) {
-    if (!userNotionToken) {
-      console.warn("노션 토큰이 없습니다. 노션 연동을 진행해주세요.");
-      return;
+  // 노션 서버로 데이터 전송. pageId가 있으면 업데이트, 없으면 새로 생성.
+  async function syncToNotion(taskText, isDone, pageId) {
+    if (!userNotionToken || !userNotionDb) {
+      console.warn("노션 연동이 아직 안 되어있습니다.");
+      return null;
     }
     try {
-      await fetch('/api/notion', {
+      const res = await fetch('/api/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          task: taskText, 
-          done: isDone, 
-          notionToken: userNotionToken 
+        body: JSON.stringify({
+          task: taskText,
+          done: isDone,
+          pageId: pageId || null,
+          notionToken: userNotionToken,
+          notionDb: userNotionDb
         })
       });
+      return await res.json();
     } catch (err) {
       console.error('Notion sync failed:', err);
+      return null;
     }
+  }
+
+  // 체크할 때, 그 할 일이 아직 Notion에 생성되는 중이면 끝날 때까지 기다렸다가 업데이트
+  async function syncCheckAfterCreate(t){
+    const pending = pendingNotionCreates.get(t.id);
+    if (pending) await pending;
+    syncToNotion(t.text, t.completed, t.notionPageId);
   }
 
   function renderTodos(){
@@ -939,10 +962,20 @@
   function addTodo(){
     const val = todoInput.value.trim();
     if(!val) return;
-    todos.push({ id: Date.now()+Math.random(), text: val, completed: false });
+    const newTodo = { id: Date.now()+Math.random(), text: val, completed: false, notionPageId: null };
+    todos.push(newTodo);
     todoInput.value = '';
     saveTodos(); renderTodos();
-    syncToNotion(val, false);
+
+    const createPromise = syncToNotion(val, false).then(result => {
+      if(result && result.data && result.data.id){
+        newTodo.notionPageId = result.data.id;
+        saveTodos();
+      }
+      pendingNotionCreates.delete(newTodo.id);
+      return result;
+    });
+    pendingNotionCreates.set(newTodo.id, createPromise);
   }
 
   addBtn.addEventListener('click', addTodo);
@@ -960,7 +993,7 @@
         t.completed = !t.completed;
         saveTodos();
         renderTodos();
-        syncToNotion(t.text, t.completed);
+        syncCheckAfterCreate(t);
       }
     } else if(del){
       todos = todos.filter(x=> String(x.id) !== del.dataset.id);
