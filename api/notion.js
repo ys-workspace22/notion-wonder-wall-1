@@ -12,12 +12,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { task, done, pageId } = req.body;
-  const NOTION_TOKEN = process.env.NOTION_TOKEN;
+  // ✅ 프론트엔드에서 보낸 notionToken을 함께 구조 분해 할당으로 받습니다.
+  const { task, done, pageId, notionToken } = req.body;
+  
+  // ✅ 사용자가 로그인해서 넘겨준 토큰이 우선하며, 없으면 환경 변수 토큰을 fallback으로 사용합니다.
+  const AUTH_TOKEN = notionToken || process.env.NOTION_TOKEN;
   const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
-  if (!NOTION_TOKEN || !DATABASE_ID) {
-    return res.status(500).json({ error: "Missing NOTION_TOKEN or NOTION_DATABASE_ID environment variables." });
+  if (!AUTH_TOKEN || !DATABASE_ID) {
+    return res.status(500).json({ error: "Missing Notion Token or NOTION_DATABASE_ID environment variables." });
   }
 
   try {
@@ -28,7 +31,7 @@ export default async function handler(req, res) {
       response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28'
         },
@@ -39,7 +42,7 @@ export default async function handler(req, res) {
         })
       });
     } else {
-      // ✅ 새로운 할 일 행 생성 (날짜 데이터 아예 제외)
+      // ✅ 새로운 할 일 행 생성
       if (!task || task.trim() === "") {
         return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
       }
@@ -47,7 +50,7 @@ export default async function handler(req, res) {
       response = await fetch('https://api.notion.com/v1/pages', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28'
         },
