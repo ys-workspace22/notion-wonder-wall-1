@@ -7,10 +7,11 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  // ✅ POST와 PATCH 요청을 모두 허용하도록 수정
+  
   if (req.method !== 'POST' && req.method !== 'PATCH') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  
   const { task, done, pageId, notionToken, notionDb } = req.body;
 
   const AUTH_TOKEN = notionToken || process.env.NOTION_TOKEN;
@@ -41,6 +42,10 @@ export default async function handler(req, res) {
       if (!task || task.trim() === "") {
         return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
       }
+
+      // ✨ 오늘 날짜를 YYYY-MM-DD 형식으로 생성하는 코드 추가
+      const today = new Date().toISOString().split('T')[0];
+
       response = await fetch('https://api.notion.com/v1/pages', {
         method: 'POST',
         headers: {
@@ -58,6 +63,10 @@ export default async function handler(req, res) {
             },
             "DONE": {
               checkbox: !!done
+            },
+            // ✨ 노션 데이터베이스의 '날짜' 속성에 오늘 날짜 전달
+            "날짜": {
+              date: { start: today }
             }
           }
         })
@@ -72,6 +81,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, data });
   } catch (error) {
     console.error('Server catch error:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(200).json({ error: error.message });
   }
 }
