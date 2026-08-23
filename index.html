@@ -207,13 +207,15 @@
     background:#f4f1ea;
     border:1px solid #ddd;
     border-radius:8px;
-    width:32px; height:32px;
-    font-size:15px;
+    height:32px;
+    font-size:13px;
     cursor:pointer;
     color:var(--ink);
     display:flex;
     align-items:center;
     justify-content:center;
+    padding: 0 10px;
+    font-family:'Do Hyeon', sans-serif;
   }
   .head-btn:hover{
     background:#eae5dc;
@@ -525,6 +527,8 @@
     <div class="wall-head">
       <div class="title">🧱 벽 너머 풍경</div>
       <div class="wall-head-actions">
+        <!-- 노션 연동 로그인 버튼 -->
+        <button class="head-btn" id="notionLoginBtn" title="내 노션 계정 연동하기">🔗 노션연동</button>
         <button class="head-btn" id="headerLogBtn" title="도감 보기">📖</button>
         <button class="head-btn" id="soundBtn" title="효과음 켜기/끄기">🔊</button>
       </div>
@@ -589,12 +593,32 @@
 
 <script>
 (function(){
+  // --- OAuth 토큰 처리 로직 ---
+  // 리다이렉트 후 URL에 notion_token 파라미터가 있으면 로컬 스토리지에 저장
+  const urlParams = new URLSearchParams(window.location.search);
+  const tokenParam = urlParams.get('notion_token');
+  if (tokenParam) {
+    localStorage.setItem('wonderwall_notion_token', tokenParam);
+    // URL에서 파라미터 숨기기 (깔끔하게 정리)
+    window.history.replaceState({}, document.title, window.location.pathname);
+    alert('노션 연동이 성공적으로 완료되었습니다! 🎉\n이제 할 일을 추가하면 내 노션으로 동기화됩니다.');
+  }
+  
+  // 저장된 토큰 가져오기
+  const userNotionToken = localStorage.getItem('wonderwall_notion_token');
+
+  // 노션 연동 로그인 버튼 이벤트 (Vercel API로 이동)
+  document.getElementById('notionLoginBtn').addEventListener('click', () => {
+    window.location.href = '/api/auth/login';
+  });
+
+  // --- 기존 WonderWall 기능 로직 ---
   const PIXABAY_API_KEY = '57149296-9d10be9789526d423ac583461'; 
   const FALLBACK_IMAGE = 'https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg';
 
   const LS_TODOS = 'wonderwall_todos_v3';
   const LS_SOUND = 'wonderwall_sound_v3';
-  const LS_LOG   = 'wonderwall_collection_v3';
+  const LS_LOG  = 'wonderwall_collection_v3';
   const LS_IMAGE = 'wonderwall_current_img_v3';
   const LS_THEME = 'wonderwall_theme_v3';
   const LS_ORDER = 'wonderwall_order_v3';
@@ -625,11 +649,6 @@
   let removedCount = parseInt(localStorage.getItem(LS_REMOVED) || '0', 10);
   let celebrated = removedCount >= TOTAL_BRICKS;
   let viewingIndex = null;
-
-  // 아직 Notion에 생성 요청이 진행 중인 할 일들을 추적함.
-  // (추가 직후 바로 체크했을 때, 생성이 끝나기 전에 체크 요청이 나가서
-  //  같은 할 일이 중복으로 생성되는 문제를 막기 위함)
-  const pendingNotionCreates = new Map();
 
   if(!order){ order = shuffledOrder(); localStorage.setItem(LS_ORDER, JSON.stringify(order)); }
 
@@ -791,33 +810,25 @@
 
   function saveTodos(){ localStorage.setItem(LS_TODOS, JSON.stringify(todos)); }
 
-  // 노션 서버(`/api/notion`)로 데이터를 전송하는 함수.
-  // pageId를 함께 보내면 서버가 "새로 만들기"가 아니라 "기존 행 업데이트"로 처리함.
-  async function syncToNotion(taskText, isDone, pageId) {
+  // 노션 서버로 데이터 전송 시 발급받은 token도 함께 전송
+  async function syncToNotion(taskText, isDone) {
+    if (!userNotionToken) {
+      console.warn("노션 토큰이 없습니다. 노션 연동을 진행해주세요.");
+      return;
+    }
     try {
-      const res = await fetch('/api/notion', {
+      await fetch('/api/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task: taskText, done: isDone, pageId: pageId || null })
+        body: JSON.stringify({ 
+          task: taskText, 
+          done: isDone, 
+          notionToken: userNotionToken 
+        })
       });
-      const result = await res.json();
-      return result; // { success: true, data: { id: '...', ... } }
     } catch (err) {
       console.error('Notion sync failed:', err);
-      return null;
     }
-  }
-
-  // 체크박스를 눌렀을 때, 그 할 일이 아직 Notion에 생성되는 중이면
-  // 생성이 끝날 때까지 기다렸다가(=notionPageId를 확보한 뒤) 업데이트를 보냄.
-  // 이 대기 없이 바로 보내면, 생성 요청이 아직 안 끝난 상태라 pageId가 비어있어서
-  // 서버가 "새로 만들기"로 처리해버려 중복 행이 생김.
-  async function syncCheckAfterCreate(t){
-    const pending = pendingNotionCreates.get(t.id);
-    if(pending){
-      await pending;
-    }
-    syncToNotion(t.text, t.completed, t.notionPageId);
   }
 
   function renderTodos(){
@@ -928,22 +939,10 @@
   function addTodo(){
     const val = todoInput.value.trim();
     if(!val) return;
-    const newTodo = { id: Date.now()+Math.random(), text: val, completed: false, notionPageId: null };
-    todos.push(newTodo);
+    todos.push({ id: Date.now()+Math.random(), text: val, completed: false });
     todoInput.value = '';
     saveTodos(); renderTodos();
-
-    // 노션에 새 행 생성 요청을 보내고, 진행 중임을 기록해둠.
-    // 응답이 오면 notionPageId를 채워넣고 대기 목록에서 지움.
-    const createPromise = syncToNotion(val, false).then(result => {
-      if(result && result.data && result.data.id){
-        newTodo.notionPageId = result.data.id;
-        saveTodos();
-      }
-      pendingNotionCreates.delete(newTodo.id);
-      return result;
-    });
-    pendingNotionCreates.set(newTodo.id, createPromise);
+    syncToNotion(val, false);
   }
 
   addBtn.addEventListener('click', addTodo);
@@ -961,8 +960,7 @@
         t.completed = !t.completed;
         saveTodos();
         renderTodos();
-        // 노션에 완료 상태 변경 연동 (생성이 진행 중이면 끝날 때까지 기다렸다가 업데이트)
-        syncCheckAfterCreate(t);
+        syncToNotion(t.text, t.completed);
       }
     } else if(del){
       todos = todos.filter(x=> String(x.id) !== del.dataset.id);
@@ -1038,7 +1036,7 @@
   }
 
   document.getElementById('deleteStampBtn').addEventListener('click', () => {
-    if(viewingIndex !== null && viewingIndex >= 0 && viewingIndex < collection.length) {
+    if(viewingIndex !== null && viewingIndex >= 0 && viewingIndex < collection.length){
       collection.splice(viewingIndex, 1);
       localStorage.setItem(LS_LOG, JSON.stringify(collection));
       document.getElementById('stampModal').classList.remove('active');
@@ -1046,8 +1044,10 @@
     }
   });
 
-  document.getElementById('stampModal')?.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('active');
+  document.getElementById('stampModal').addEventListener('click', (e) => {
+    if(e.target === document.getElementById('stampModal')){
+      document.getElementById('stampModal').classList.remove('active');
+    }
   });
 
   fetchRandomLandscape();
