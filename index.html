@@ -3170,7 +3170,12 @@
   if (notionConnected) {
 
     loadTodosFromNotion();
-
+    
+ setInterval(() => {
+    if (!isLoadingFromNotion) {
+      loadTodosFromNotion();
+    }
+  }, 3000);
   }
 
 
