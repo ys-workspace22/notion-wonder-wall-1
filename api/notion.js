@@ -8,7 +8,9 @@ export default async function handler(req, res) {
   );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // CORS preflight
+  // ====================================
+  // CORS
+  // ====================================
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -35,6 +37,20 @@ export default async function handler(req, res) {
     req.body?.notionDb ||
     process.env.NOTION_DATABASE_ID;
 
+  if (!NOTION_TOKEN) {
+    return res.status(500).json({
+      success: false,
+      error: 'NOTION_TOKEN is not configured'
+    });
+  }
+
+  if (!DATABASE_ID) {
+    return res.status(500).json({
+      success: false,
+      error: 'NOTION_DATABASE_ID is not configured'
+    });
+  }
+
   const todayISO = new Date().toISOString().split('T')[0];
 
   try {
@@ -42,43 +58,72 @@ export default async function handler(req, res) {
     // ====================================
     // GET
     // Notion DB → 위젯
+    //
+    // Notion에서 추가/수정/체크/삭제된
+    // 현재 상태를 그대로 가져옵니다.
     // ====================================
     if (req.method === 'GET') {
 
-      const response = await fetch(
-        `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${NOTION_TOKEN}`,
-            'Content-Type': 'application/json',
-            'Notion-Version': '2022-06-28'
-          },
-          body: JSON.stringify({
-            sorts: [
-              {
-                timestamp: 'created_time',
-                direction: 'ascending'
-              }
-            ]
-          })
+      let allResults = [];
+      let startCursor = undefined;
+
+      do {
+        const body = {
+          sorts: [
+            {
+              timestamp: 'created_time',
+              direction: 'ascending'
+            }
+          ],
+          page_size: 100
+        };
+
+        if (startCursor) {
+          body.start_cursor = startCursor;
         }
-      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || 'Notion Query Error'
+        const response = await fetch(
+          `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${NOTION_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify(body)
+          }
         );
-      }
 
-      const todos = data.results
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || 'Notion Query Error'
+          );
+        }
+
+        allResults = allResults.concat(
+          data.results || []
+        );
+
+        startCursor = data.has_more
+          ? data.next_cursor
+          : undefined;
+
+      } while (startCursor);
+
+
+      const todos = allResults
+        // 삭제/보관된 페이지는 위젯에 표시하지 않음
         .filter(page => !page.archived)
         .map(page => {
 
           const props = page.properties || {};
 
+          // ====================================
+          // 할 일 제목
+          // ====================================
           let taskText = '';
 
           if (
@@ -91,13 +136,34 @@ export default async function handler(req, res) {
               .join('');
           }
 
+          // ====================================
+          // 날짜
+          // ====================================
+          let date = null;
+
+          if (
+            props['날짜'] &&
+            props['날짜'].date
+          ) {
+            date = props['날짜'].date.start || null;
+          }
+
+          // ====================================
+          // 위젯으로 전달
+          // ====================================
           return {
             id: page.id,
             notionPageId: page.id,
+
             text: taskText,
-            completed: props['DONE']?.checkbox || false,
-            date: props['날짜']?.date?.start || null,
-            lastEditedTime: page.last_edited_time
+
+            completed:
+              props['DONE']?.checkbox || false,
+
+            date,
+
+            lastEditedTime:
+              page.last_edited_time
           };
         });
 
@@ -110,7 +176,13 @@ export default async function handler(req, res) {
 
     // ====================================
     // DELETE
-    // 위젯 X → Notion DB
+    //
+    // 위젯 X
+    //     ↓
+    // Notion 해당 페이지 삭제
+    //
+    // Notion API에서는 archived=true로
+    // 페이지를 휴지통으로 보냅니다.
     // ====================================
     if (req.method === 'DELETE') {
 
@@ -125,10 +197,6 @@ export default async function handler(req, res) {
         });
       }
 
-      /*
-       * Notion API에서는 페이지를 완전히 물리적으로 삭제하는 대신
-       * archived: true 로 만들어 휴지통으로 보냅니다.
-       */
       const response = await fetch(
         `https://api.notion.com/v1/pages/${pageId}`,
         {
@@ -161,12 +229,17 @@ export default async function handler(req, res) {
 
     // ====================================
     // PATCH
-    // 위젯 체크 → Notion DB
+    //
+    // 위젯 → Notion
+    //
+    // 체크뿐 아니라
+    // 제목 수정 + 체크 상태 수정까지 지원
     // ====================================
     if (req.method === 'PATCH') {
 
       const {
         pageId,
+        task,
         done
       } = req.body || {};
 
@@ -174,6 +247,45 @@ export default async function handler(req, res) {
         return res.status(400).json({
           success: false,
           error: 'pageId is required'
+        });
+      }
+
+      const properties = {};
+
+      // ====================================
+      // 제목 수정
+      // ====================================
+      if (
+        typeof task === 'string'
+      ) {
+        properties['할 일'] = {
+          title: [
+            {
+              text: {
+                content: task
+              }
+            }
+          ]
+        };
+      }
+
+      // ====================================
+      // 체크 상태 수정
+      // ====================================
+      if (
+        typeof done !== 'undefined'
+      ) {
+        properties.DONE = {
+          checkbox: !!done
+        };
+      }
+
+      if (
+        Object.keys(properties).length === 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: 'Nothing to update'
         });
       }
 
@@ -187,11 +299,7 @@ export default async function handler(req, res) {
             'Notion-Version': '2022-06-28'
           },
           body: JSON.stringify({
-            properties: {
-              DONE: {
-                checkbox: !!done
-              }
-            }
+            properties
           })
         }
       );
@@ -213,15 +321,104 @@ export default async function handler(req, res) {
 
     // ====================================
     // POST
-    // 위젯 → Notion DB 새 할 일
+    //
+    // 기존 방식 그대로 유지
+    //
+    // pageId 없음
+    // → 새 할 일 생성
+    //
+    // pageId 있음
+    // → 기존 할 일 수정
+    //
+    // 이렇게 해두면 기존 위젯 코드와
+    // 호환될 가능성이 높습니다.
     // ====================================
     if (req.method === 'POST') {
 
       const {
         task,
-        done
+        done,
+        pageId
       } = req.body || {};
 
+
+      // ====================================
+      // POST + pageId
+      //
+      // 기존 할 일 수정
+      // ====================================
+      if (pageId) {
+
+        const properties = {};
+
+        // 제목이 전달되면 제목 수정
+        if (
+          typeof task === 'string'
+        ) {
+          properties['할 일'] = {
+            title: [
+              {
+                text: {
+                  content: task
+                }
+              }
+            ]
+          };
+        }
+
+        // done이 전달되면 체크 상태 수정
+        if (
+          typeof done !== 'undefined'
+        ) {
+          properties.DONE = {
+            checkbox: !!done
+          };
+        }
+
+        if (
+          Object.keys(properties).length === 0
+        ) {
+          return res.status(400).json({
+            success: false,
+            error: 'Nothing to update'
+          });
+        }
+
+        const response = await fetch(
+          `https://api.notion.com/v1/pages/${pageId}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${NOTION_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify({
+              properties
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || 'Notion Update Error'
+          );
+        }
+
+        return res.status(200).json({
+          success: true,
+          data
+        });
+      }
+
+
+      // ====================================
+      // POST + pageId 없음
+      //
+      // 새 할 일 생성
+      // ====================================
       if (!task || task.trim() === '') {
         return res.status(200).json({
           success: true,
@@ -245,6 +442,7 @@ export default async function handler(req, res) {
 
             properties: {
 
+              // 할 일
               '할 일': {
                 title: [
                   {
@@ -255,10 +453,12 @@ export default async function handler(req, res) {
                 ]
               },
 
+              // 완료 여부
               DONE: {
                 checkbox: !!done
               },
 
+              // 날짜
               날짜: {
                 date: {
                   start: todayISO
@@ -285,7 +485,10 @@ export default async function handler(req, res) {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      'Notion API Error:',
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -293,4 +496,3 @@ export default async function handler(req, res) {
     });
   }
 }
-```
