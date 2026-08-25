@@ -186,4 +186,3 @@ export default async function handler(req, res) {
     });
   }
 }
-확인해줘
