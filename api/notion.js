@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
   try {
-    // 1. [GET] 노션 DB에 있는 데이터 목록을 위젯으로 가져오기 (이게 있어야 노션에서 쓴 게 위젯에 뜸!)
+    // 1. [GET] 노션 DB 데이터를 읽어와서 프론트엔드가 바로 쓸 수 있는 깔끔한 형태로 변환하여 전달
     if (req.method === 'GET') {
       const response = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
         method: 'POST',
@@ -25,7 +25,21 @@ export default async function handler(req, res) {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Notion API Error');
-      return res.status(200).json({ success: true, data: data.results });
+
+      // 노션의 복잡한 JSON 구조를 프론트엔드가 쉽게 읽을 수 있도록 평평하게(flat) 가공
+      const formattedResults = data.results.map((page) => {
+        const titleProp = page.properties["할 일"]?.title;
+        const taskText = titleProp && titleProp.length > 0 ? titleProp[0].plain_text : "";
+        const doneProp = page.properties["DONE"]?.checkbox ?? false;
+
+        return {
+          id: page.id,
+          task: taskText,
+          done: doneProp
+        };
+      });
+
+      return res.status(200).json({ success: true, data: formattedResults });
     }
 
     // 2. [POST] 위젯에서 새 할 일을 추가할 때
