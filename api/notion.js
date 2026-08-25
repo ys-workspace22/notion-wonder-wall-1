@@ -1,78 +1,188 @@
 // api/notion.js
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  
-  if (req.method !== 'POST' && req.method !== 'PATCH') {
+
+  if (
+    req.method !== 'GET' &&
+    req.method !== 'POST' &&
+    req.method !== 'PATCH'
+  ) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { task, done, pageId } = req.body;
-  const NOTION_TOKEN = process.env.NOTION_TOKEN;
-  const DATABASE_ID = process.env.NOTION_DATABASE_ID;
+  const NOTION_TOKEN =
+    req.query?.notionToken ||
+    req.body?.notionToken ||
+    process.env.NOTION_TOKEN;
+
+  const DATABASE_ID =
+    req.query?.notionDb ||
+    req.body?.notionDb ||
+    process.env.NOTION_DATABASE_ID;
+
   const todayISO = new Date().toISOString().split('T')[0];
 
   try {
+
+    // ====================================
+    // GET : Notion DB → 위젯
+    // ====================================
+    if (req.method === 'GET') {
+      const response = await fetch(
+        `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${NOTION_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify({
+            sorts: [
+              {
+                timestamp: 'created_time',
+                direction: 'ascending'
+              }
+            ]
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Notion Query Error');
+      }
+
+      const todos = data.results.map(page => {
+        const props = page.properties || {};
+
+        let taskText = '';
+
+        if (
+          props['할 일'] &&
+          props['할 일'].title &&
+          props['할 일'].title.length > 0
+        ) {
+          taskText = props['할 일'].title
+            .map(item => item.plain_text || '')
+            .join('');
+        }
+
+        return {
+          id: page.id,
+          notionPageId: page.id,
+          text: taskText,
+          completed: props['DONE']?.checkbox || false,
+          date: props['날짜']?.date?.start || null,
+          lastEditedTime: page.last_edited_time
+        };
+      });
+
+      return res.status(200).json({
+        success: true,
+        todos
+      });
+    }
+
+    const { task, done, pageId } = req.body;
+
     let response;
 
+    // ====================================
+    // PATCH : 체크 상태 수정
+    // ====================================
     if (pageId) {
-      // 완료 체크 상태 업데이트
-      response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${NOTION_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28'
-        },
-        body: JSON.stringify({
-          properties: {
-            "DONE": { checkbox: !!done }
-          }
-        })
-      });
-    } else {
-      // 새로운 할 일 생성
-      if (!task || task.trim() === "") {
-        return res.status(200).json({ success: true, message: "No task provided, skipped creation." });
-      }
-      response = await fetch('https://api.notion.com/v1/pages', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${NOTION_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28'
-        },
-        body: JSON.stringify({
-          parent: { database_id: DATABASE_ID },
-          properties: {
-            "할 일": {
-              title: [
-                { text: { content: task } }
-              ]
-            },
-            "DONE": {
-              checkbox: !!done
-            },
-            "날짜": {
-              date: { start: todayISO }
+      response = await fetch(
+        `https://api.notion.com/v1/pages/${pageId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${NOTION_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify({
+            properties: {
+              DONE: {
+                checkbox: !!done
+              }
             }
-          }
-        })
-      });
+          })
+        }
+      );
+    }
+
+    // ====================================
+    // POST : 새 할 일 생성
+    // ====================================
+    else {
+      if (!task || task.trim() === '') {
+        return res.status(200).json({
+          success: true,
+          message: 'No task provided'
+        });
+      }
+
+      response = await fetch(
+        'https://api.notion.com/v1/pages',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${NOTION_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+          body: JSON.stringify({
+            parent: {
+              database_id: DATABASE_ID
+            },
+            properties: {
+              '할 일': {
+                title: [
+                  {
+                    text: {
+                      content: task
+                    }
+                  }
+                ]
+              },
+              DONE: {
+                checkbox: !!done
+              },
+              날짜: {
+                date: {
+                  start: todayISO
+                }
+              }
+            }
+          })
+        }
+      );
     }
 
     const data = await response.json();
+
     if (!response.ok) {
       throw new Error(data.message || 'Notion API Error');
     }
-    return res.status(200).json({ success: true, data });
+
+    return res.status(200).json({
+      success: true,
+      data
+    });
+
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: error.message });
+
+    return res.status(500).json({
+      error: error.message
+    });
   }
 }
