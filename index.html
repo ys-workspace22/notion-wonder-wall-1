@@ -1967,7 +1967,7 @@
 
 
     if (
-      order.indexOf(i) <
+      order.indexOf(i) 
       removedCount
     ) {
 
@@ -2189,7 +2189,7 @@
 
 
     } else if (
-      targetRemoved <
+      targetRemoved 
       removedCount
     ) {
 
@@ -2197,7 +2197,7 @@
         (el, idx) => {
 
           const shouldBeGone =
-            order.indexOf(idx) <
+            order.indexOf(idx) 
             targetRemoved;
 
 
@@ -2875,23 +2875,63 @@
 
   /* =========================================================
      19. 새 벽
+     =========================================================
+
+     ⭐ 수정된 부분:
+     기존 코드는 벽돌/카운트만 리셋하고
+     todos의 completed는 그대로 두었기 때문에,
+     마지막 줄 renderTodos() → updateProgress()가
+     "아직 완료된 할 일이 있으니 진행률 100%"로 계산해서
+     방금 리셋한 벽돌을 곧바로 다시 와르르 무너뜨리고
+     완료 멘트를 또 띄우는 문제가 있었음.
+
+     그래서 새 벽을 쌓을 때 todos의 완료 상태도
+     함께 초기화하고, 노션에 연동되어 있다면
+     노션 쪽에도 "미완료"로 반영해서
+     3초마다 도는 자동 동기화가 완료 상태를
+     다시 덮어쓰지 않도록 함.
      ========================================================= */
 
   nextWallBtn.addEventListener(
     'click',
-    () => {
+    async () => {
 
       /*
-       * 주의:
-       * 새 벽을 쌓아도 Notion DB의
-       * 할 일은 삭제하지 않는다.
-       *
-       * 양방향 동기화의 기준은 Notion DB이기 때문.
+       * 1) 로컬 완료 상태 초기화
        */
+      todos = todos.map(t => ({
+        ...t,
+        completed: false
+      }));
 
+      saveTodos();
+
+
+      /*
+       * 2) 노션에도 "미완료"로 반영
+       */
+      await Promise.all(
+        todos
+          .filter(t => t.notionPageId)
+          .map(t =>
+            syncToNotion(
+              t.text,
+              false,
+              t.notionPageId
+            )
+          )
+      );
+
+
+      /*
+       * 3) 벽 이미지 새로 뽑기
+       */
       fetchRandomLandscape(true);
 
 
+      /*
+       * 4) 벽돌 순서 / 카운트 초기화
+       */
       order =
         shuffledOrder();
 
@@ -2929,6 +2969,11 @@
       );
 
 
+      /*
+       * 5) 이제 완료 상태도 0이므로
+       *    진행률 0%로 정상 계산되어
+       *    재무너짐 없이 새 벽이 유지됨
+       */
       renderTodos();
 
     }
@@ -3084,7 +3129,7 @@
         if (
           viewingIndex !== null &&
           viewingIndex >= 0 &&
-          viewingIndex <
+          viewingIndex 
             collection.length
         ) {
 
