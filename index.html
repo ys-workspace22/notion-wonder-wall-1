@@ -453,6 +453,15 @@
     background: #fef3d8;
     color: var(--amber);
   }
+  .msg-tag.weird {
+  background: #eef5ff;
+  color: #4a6fc6;
+}
+
+.msg-tag.legend {
+  background: #f5ebff;
+  color: #8a3fd1;
+}
 
   .msg-text {
     font-size: 14.5px;
@@ -2417,12 +2426,15 @@
 
 
       msgTag.textContent =
-        type === 'cheer'
-          ? '응원형'
-          : type === 'savage'
-            ? '팩폭형'
-            : '보상형';
-
+       type === 'cheer'
+    ? '응원형'
+    : type === 'savage'
+      ? '팩폭형'
+      : type === 'reward'
+        ? '보상형'
+        : type === 'weird'
+          ? '이벤트형'
+          : '전설형';
 
       msgText.textContent =
         baseText;
@@ -2813,7 +2825,7 @@
 
     input.select();
 
-    isEditing = true;
+ 
 
 
     let committed =
@@ -2953,14 +2965,10 @@
   'click',
   async () => {
     
+      if (isResettingWall) return;
+
     isResettingWall = true;
-
-    console.log('🔥 새 벽 클릭');
-    console.log('현재 todos:', todos);
-
-    setTimeout(() => {
-  console.log('3초 후 todos:', todos);
-}, 10000);
+    
 
     // 현재 목록 백업
     const oldTodos = [...todos];
