@@ -2928,7 +2928,7 @@
     // ======================
     // 노션 삭제는 뒤에서 실행
     // ======================
-    Promise.all(
+    await Promise.all(
       oldTodos
         .filter(t => t.notionPageId)
         .map(t => deleteFromNotion(t.notionPageId))
