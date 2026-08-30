@@ -1078,7 +1078,7 @@
    * Notion에서 데이터를 불러오는 중인지 표시
    */
   let isLoadingFromNotion = false;
-
+  let isResettingWall = false;
 
   /*
    * 노션 연동 여부
@@ -2880,6 +2880,8 @@
  nextWallBtn.addEventListener(
   'click',
   async () => {
+    
+    isResettingWall = true;
 
     console.log('🔥 새 벽 클릭');
     console.log('현재 todos:', todos);
@@ -2928,19 +2930,26 @@
     // ======================
     // 노션 삭제는 뒤에서 실행
     // ======================
-    await Promise.all(
-      oldTodos
-        .filter(t => t.notionPageId)
-        .map(t => deleteFromNotion(t.notionPageId))
-    ).catch(err => {
-      console.error(
-        '노션 삭제 실패:',
-        err
-      );
-    });
+   try {
 
-  }
-);
+  await Promise.all(
+    oldTodos
+      .filter(t => t.notionPageId)
+      .map(t => deleteFromNotion(t.notionPageId))
+  );
+
+} catch (err) {
+
+  console.error(
+    '노션 삭제 실패:',
+    err
+  );
+
+} finally {
+
+  isResettingWall = false;
+
+}
 
   /* =========================================================
      20. 도감
@@ -3178,11 +3187,14 @@
 
   loadTodosFromNotion();
     
-  setInterval(() => {
-    if (!isLoadingFromNotion) {
-      loadTodosFromNotion();
-    }
-  }, 3000);
+ setInterval(() => {
+  if (
+    !isLoadingFromNotion &&
+    !isResettingWall
+  ) {
+    loadTodosFromNotion();
+  }
+}, 3000);
 
 }
 
