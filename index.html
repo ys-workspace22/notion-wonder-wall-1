@@ -2877,62 +2877,54 @@
      19. 새 벽
      ========================================================= */
 
-  nextWallBtn.addEventListener(
-    'click',
-    () => {
+ nextWallBtn.addEventListener(
+  'click',
+  async () => {
 
-      /*
-       * 주의:
-       * 새 벽을 쌓아도 Notion DB의
-       * 할 일은 삭제하지 않는다.
-       *
-       * 양방향 동기화의 기준은 Notion DB이기 때문.
-       */
+    // 노션 DB 삭제
+    for (const t of todos) {
+      if (t.notionPageId) {
+        await deleteFromNotion(t.notionPageId);
+      }
+    }
 
-      fetchRandomLandscape(true);
+    // 위젯 Todo 삭제
+    todos = [];
+    saveTodos();
+    renderTodos();
 
+    // 벽 초기화
+    fetchRandomLandscape(true);
 
-      order =
-        shuffledOrder();
+    order = shuffledOrder();
 
+    localStorage.setItem(
+      LS_ORDER,
+      JSON.stringify(order)
+    );
 
-      localStorage.setItem(
-        LS_ORDER,
-        JSON.stringify(order)
-      );
+    removedCount = 0;
 
+    localStorage.setItem(
+      LS_REMOVED,
+      '0'
+    );
 
-      removedCount =
-        0;
+    brickEls.forEach(el =>
+      el.classList.remove('gone')
+    );
 
+    celebrated = false;
 
-      localStorage.setItem(
-        LS_REMOVED,
-        '0'
-      );
+    msgCard.classList.remove('show');
 
-
-      brickEls.forEach(
-        el =>
-          el.classList.remove(
-            'gone'
-          )
-      );
-
-
-      celebrated =
-        false;
-
-
-      msgCard.classList.remove(
-        'show'
-      );
+  }
+);
 
 
   
 
-    }
-  );
+  
 
 
   /* =========================================================
