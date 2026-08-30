@@ -2878,16 +2878,10 @@
 
 nextWallBtn.addEventListener(
   'click',
-  async () => {
+  () => {
 
-    /*
-     * 새 풍경 불러오기
-     */
     fetchRandomLandscape(true);
 
-    /*
-     * 벽 순서 다시 섞기
-     */
     order = shuffledOrder();
 
     localStorage.setItem(
@@ -2895,9 +2889,6 @@ nextWallBtn.addEventListener(
       JSON.stringify(order)
     );
 
-    /*
-     * 벽 초기화
-     */
     removedCount = 0;
 
     localStorage.setItem(
@@ -2918,32 +2909,14 @@ nextWallBtn.addEventListener(
       'show'
     );
 
-    /*
-     * 모든 할 일 체크 해제
-     */
-    todos.forEach(t => {
-      t.completed = false;
-    });
+    todos = [];
 
     saveTodos();
-    renderTodos();
 
-    /*
-     * Notion에도 체크 해제 반영
-     */
-    await Promise.all(
-      todos.map(t =>
-        syncToNotion(
-          t.text,
-          false,
-          t.notionPageId
-        )
-      )
-    );
+    renderTodos();
 
   }
 );
-
 
   /* =========================================================
      20. 도감
@@ -3177,16 +3150,7 @@ nextWallBtn.addEventListener(
    *
    * 이것이 "Notion → 위젯" 부분이다.
    */
-  if (notionConnected) {
-
-    loadTodosFromNotion();
-    
- setInterval(() => {
-    if (!isLoadingFromNotion) {
-      loadTodosFromNotion();
-    }
-  }, 3000);
-  }
+// loadTodosFromNotion();
 
 
 })();
