@@ -2881,22 +2881,22 @@
   'click',
   async () => {
 
-       console.log('🔥 새 벽 클릭');
+    console.log('🔥 새 벽 클릭');
     console.log('현재 todos:', todos);
-    
-  // 노션 DB 삭제 (동시에 실행)
-await Promise.all(
-  todos
-    .filter(t => t.notionPageId)
-    .map(t => deleteFromNotion(t.notionPageId))
-);
 
-    // 위젯 Todo 삭제
+    // 현재 목록 백업
+    const oldTodos = [...todos];
+
+    // ======================
+    // 위젯 즉시 초기화
+    // ======================
     todos = [];
     saveTodos();
     renderTodos();
 
+    // ======================
     // 벽 초기화
+    // ======================
     fetchRandomLandscape(true);
 
     order = shuffledOrder();
@@ -2921,9 +2921,22 @@ await Promise.all(
 
     msgCard.classList.remove('show');
 
+    // ======================
+    // 노션 삭제는 뒤에서 실행
+    // ======================
+    Promise.all(
+      oldTodos
+        .filter(t => t.notionPageId)
+        .map(t => deleteFromNotion(t.notionPageId))
+    ).catch(err => {
+      console.error(
+        '노션 삭제 실패:',
+        err
+      );
+    });
+
   }
 );
-
 
   /* =========================================================
      20. 도감
