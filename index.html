@@ -2872,70 +2872,77 @@
     }
   );
 
+/* =========================================================
+   19. 새 벽
+   ========================================================= */
 
-  /* =========================================================
-     19. 새 벽
-     ========================================================= */
+nextWallBtn.addEventListener(
+  'click',
+  async () => {
 
-  nextWallBtn.addEventListener(
-    'click',
-    () => {
+    /*
+     * 새 풍경 불러오기
+     */
+    fetchRandomLandscape(true);
 
-      /*
-       * 주의:
-       * 새 벽을 쌓아도 Notion DB의
-       * 할 일은 삭제하지 않는다.
-       *
-       * 양방향 동기화의 기준은 Notion DB이기 때문.
-       */
+    /*
+     * 벽 순서 다시 섞기
+     */
+    order = shuffledOrder();
 
-      fetchRandomLandscape(true);
+    localStorage.setItem(
+      LS_ORDER,
+      JSON.stringify(order)
+    );
 
+    /*
+     * 벽 초기화
+     */
+    removedCount = 0;
 
-      order =
-        shuffledOrder();
+    localStorage.setItem(
+      LS_REMOVED,
+      '0'
+    );
 
+    brickEls.forEach(
+      el =>
+        el.classList.remove(
+          'gone'
+        )
+    );
 
-      localStorage.setItem(
-        LS_ORDER,
-        JSON.stringify(order)
-      );
+    celebrated = false;
 
+    msgCard.classList.remove(
+      'show'
+    );
 
-      removedCount =
-        0;
+    /*
+     * 모든 할 일 체크 해제
+     */
+    todos.forEach(t => {
+      t.completed = false;
+    });
 
+    saveTodos();
+    renderTodos();
 
-      localStorage.setItem(
-        LS_REMOVED,
-        '0'
-      );
+    /*
+     * Notion에도 체크 해제 반영
+     */
+    await Promise.all(
+      todos.map(t =>
+        syncToNotion(
+          t.text,
+          false,
+          t.notionPageId
+        )
+      )
+    );
 
-
-      brickEls.forEach(
-        el =>
-          el.classList.remove(
-            'gone'
-          )
-      );
-
-
-      celebrated =
-        false;
-
-
-      msgCard.classList.remove(
-        'show'
-      );
-
-/* 위젯의 투두만 비우기 */
-todos = [];
-saveTodos();
-      
-      renderTodos();
-
-    }
-  );
+  }
+);
 
 
   /* =========================================================
