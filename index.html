@@ -2884,6 +2884,10 @@
     console.log('🔥 새 벽 클릭');
     console.log('현재 todos:', todos);
 
+    setTimeout(() => {
+  console.log('3초 후 todos:', todos);
+}, 3000);
+
     // 현재 목록 백업
     const oldTodos = [...todos];
 
