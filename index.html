@@ -1079,7 +1079,7 @@
    */
   let isLoadingFromNotion = false;
   let isResettingWall = false;
-  let isEditing = false;
+  let isEditingTodo = false;
   /*
    * 노션 연동 여부
    */
@@ -2685,7 +2685,7 @@
      ========================================================= */
 
   function startEdit(id) {
-
+  isEditingTodo = true;
     const t =
       todos.find(
         x =>
@@ -2786,7 +2786,7 @@
 
         renderTodos();
 
-      isEditing = false;
+      isEditingTodo = false;
         /*
          * ⭐ 제목이 바뀌었으므로
          * Notion에도 PATCH
@@ -2835,6 +2835,7 @@
         ) {
 
           committed = true;
+          isEditingTodo = false;
 
           renderTodos();
 
@@ -3196,7 +3197,7 @@ setInterval(() => {
   if (
     !isLoadingFromNotion &&
     !isResettingWall &&
-    !isEditing
+    !isEditingTodo
   ) {
     loadTodosFromNotion();
   }
