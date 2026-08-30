@@ -3174,11 +3174,11 @@
 
   loadTodosFromNotion();
     
-  // setInterval(() => {
-  //   if (!isLoadingFromNotion) {
-  //     loadTodosFromNotion();
-  //   }
-  // }, 1000);
+  setInterval(() => {
+    if (!isLoadingFromNotion) {
+      loadTodosFromNotion();
+    }
+  }, 3000);
 
 }
 
