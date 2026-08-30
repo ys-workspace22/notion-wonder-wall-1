@@ -1081,14 +1081,6 @@
 
 
   /*
-   * ⭐ 추가된 부분
-   * 쓰기 작업(추가/수정/삭제/새벽쌓기) 진행 중에는
-   * 3초 폴링이 끼어들어 데이터를 덮어쓰지 못하도록 막는 잠금장치
-   */
-  let pausePolling = false;
-
-
-  /*
    * 노션 연동 여부
    */
   const notionConnected =
@@ -1975,7 +1967,7 @@
 
 
     if (
-      order.indexOf(i) 
+      order.indexOf(i) <
       removedCount
     ) {
 
@@ -2197,7 +2189,7 @@
 
 
     } else if (
-      targetRemoved 
+      targetRemoved <
       removedCount
     ) {
 
@@ -2205,7 +2197,7 @@
         (el, idx) => {
 
           const shouldBeGone =
-            order.indexOf(idx) 
+            order.indexOf(idx) <
             targetRemoved;
 
 
@@ -2543,11 +2535,6 @@
 
   /* =========================================================
      16. 체크 / 수정 / 삭제
-     =========================================================
-
-     ⭐ 수정된 부분:
-     체크/삭제 요청이 노션 서버에 반영되는 동안
-     3초 폴링이 끼어들지 못하도록 pausePolling을 사용.
      ========================================================= */
 
   todoListEl.addEventListener(
@@ -2578,131 +2565,114 @@
         );
 
 
-      pausePolling = true;
+      /* -----------------------------------------
+         체크
+         ----------------------------------------- */
 
-      try {
+      if (box) {
 
-        /* -----------------------------------------
-           체크
-           ----------------------------------------- */
-
-        if (box) {
-
-          const id =
-            box.dataset.id;
+        const id =
+          box.dataset.id;
 
 
-          const t =
-            todos.find(
-              x =>
-                String(x.id) ===
-                String(id)
-            );
-
-
-          if (!t) {
-            return;
-          }
-
-
-          t.completed =
-            !t.completed;
-
-
-          saveTodos();
-
-          renderTodos();
-
-
-          await syncCheckAfterCreate(
-            t
+        const t =
+          todos.find(
+            x =>
+              String(x.id) ===
+              String(id)
           );
 
 
+        if (!t) {
           return;
-
         }
 
 
-        /* -----------------------------------------
-           삭제
-           ----------------------------------------- */
-
-        if (del) {
-
-          const id =
-            del.dataset.id;
+        t.completed =
+          !t.completed;
 
 
-          const t =
-            todos.find(
-              x =>
-                String(x.id) ===
-                String(id)
-            );
+        saveTodos();
+
+        renderTodos();
 
 
-          if (!t) {
-            return;
-          }
+        await syncCheckAfterCreate(
+          t
+        );
 
 
-          /*
-           * 먼저 위젯에서 삭제
-           */
-          todos =
-            todos.filter(
-              x =>
-                String(x.id) !==
-                String(id)
-            );
+        return;
+
+      }
 
 
-          saveTodos();
+      /* -----------------------------------------
+         삭제
+         ----------------------------------------- */
 
-          renderTodos();
+      if (del) {
 
-
-          /*
-           * 그리고 Notion에서도 삭제
-           */
-          if (t.notionPageId) {
-
-            await deleteFromNotion(
-              t.notionPageId
-            );
-
-          }
+        const id =
+          del.dataset.id;
 
 
-          return;
-
-        }
-
-
-        /* -----------------------------------------
-           * 수정
-           * ----------------------------------------- */
-
-        if (editBtn || txt) {
-
-          startEdit(
-            (editBtn || txt)
-              .dataset.id
+        const t =
+          todos.find(
+            x =>
+              String(x.id) ===
+              String(id)
           );
 
+
+        if (!t) {
+          return;
         }
 
-      } finally {
 
         /*
-         * 작업이 끝난 뒤 0.5초 여유를 두고
-         * 폴링을 재개한다.
-         * (노션 서버 쪽 반영이 완전히 끝나길 기다림)
+         * 먼저 위젯에서 삭제
          */
-        setTimeout(() => {
-          pausePolling = false;
-        }, 500);
+        todos =
+          todos.filter(
+            x =>
+              String(x.id) !==
+              String(id)
+          );
+
+
+        saveTodos();
+
+        renderTodos();
+
+
+        /*
+         * 그리고 Notion에서도 삭제
+         */
+        if (t.notionPageId) {
+
+          await deleteFromNotion(
+            t.notionPageId
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* -----------------------------------------
+         * 수정
+         * ----------------------------------------- */
+
+      if (editBtn || txt) {
+
+        startEdit(
+          (editBtn || txt)
+            .dataset.id
+        );
 
       }
 
@@ -2790,63 +2760,48 @@
         committed = true;
 
 
+        const newText =
+          input.value.trim();
+
+
         /*
-         * ⭐ 수정 중에도 폴링을 잠깐 막는다
+         * 빈칸이면 원래 내용 유지
          */
-        pausePolling = true;
+        if (!newText) {
 
-        try {
+          t.text =
+            oldText;
 
-          const newText =
-            input.value.trim();
+        } else {
 
+          t.text =
+            newText;
 
-          /*
-           * 빈칸이면 원래 내용 유지
-           */
-          if (!newText) {
-
-            t.text =
-              oldText;
-
-          } else {
-
-            t.text =
-              newText;
-
-          }
+        }
 
 
-          saveTodos();
+        saveTodos();
 
-          renderTodos();
+        renderTodos();
 
 
-          /*
-           * ⭐ 제목이 바뀌었으므로
-           * Notion에도 PATCH
-           */
-          if (
+        /*
+         * ⭐ 제목이 바뀌었으므로
+         * Notion에도 PATCH
+         */
+        if (
+          t.notionPageId
+        ) {
+
+          await syncToNotion(
+
+            t.text,
+
+            t.completed,
+
             t.notionPageId
-          ) {
 
-            await syncToNotion(
-
-              t.text,
-
-              t.completed,
-
-              t.notionPageId
-
-            );
-
-          }
-
-        } finally {
-
-          setTimeout(() => {
-            pausePolling = false;
-          }, 500);
+          );
 
         }
 
@@ -2920,127 +2875,64 @@
 
   /* =========================================================
      19. 새 벽
-     =========================================================
-
-     ⭐ 방식 A + 폴링 잠금 적용:
-
-     노션 DB의 할 일은 삭제하지 않고 그대로 남겨서
-     완료 기록/이력이 노션에 계속 쌓이게 한다.
-
-     대신 위젯과 노션 양쪽 모두 completed를 false로
-     되돌려서 새 벽에서 같은 할 일을 다시 체크할 수 있게 한다.
-
-     추가로 pausePolling을 사용해서, 이 작업이 진행되는
-     동안(및 끝난 직후) 3초 폴링이 끼어들어 아직 반영이
-     덜 된 데이터로 덮어쓰는 것을 막는다.
      ========================================================= */
 
   nextWallBtn.addEventListener(
     'click',
-    async () => {
+    () => {
 
-      pausePolling = true;
+      /*
+       * 주의:
+       * 새 벽을 쌓아도 Notion DB의
+       * 할 일은 삭제하지 않는다.
+       *
+       * 양방향 동기화의 기준은 Notion DB이기 때문.
+       */
 
-      try {
-
-        /*
-         * 0) 아직 노션에 생성 중인(pending) 할 일이 있다면
-         *    먼저 생성이 끝날 때까지 기다린다.
-         */
-        await Promise.all(
-          Array.from(pendingNotionCreates.values())
-        );
+      fetchRandomLandscape(true);
 
 
-        /*
-         * 1) 로컬 완료 상태 초기화
-         *    (todos 자체는 지우지 않는다)
-         */
-        todos = todos.map(t => ({
-          ...t,
-          completed: false
-        }));
-
-        saveTodos();
+      order =
+        shuffledOrder();
 
 
-        /*
-         * 2) 노션에도 "미완료"로 반영
-         *    (노션 DB의 항목 자체는 삭제하지 않고
-         *    DONE 체크만 해제)
-         */
-        await Promise.all(
-          todos
-            .filter(t => t.notionPageId)
-            .map(t =>
-              syncToNotion(
-                t.text,
-                false,
-                t.notionPageId
-              )
-            )
-        );
+      localStorage.setItem(
+        LS_ORDER,
+        JSON.stringify(order)
+      );
 
 
-        /*
-         * 3) 벽 이미지 새로 뽑기
-         */
-        fetchRandomLandscape(true);
+      removedCount =
+        0;
 
 
-        /*
-         * 4) 벽돌 순서/카운트 초기화
-         */
-        order =
-          shuffledOrder();
+      localStorage.setItem(
+        LS_REMOVED,
+        '0'
+      );
 
 
-        localStorage.setItem(
-          LS_ORDER,
-          JSON.stringify(order)
-        );
+      brickEls.forEach(
+        el =>
+          el.classList.remove(
+            'gone'
+          )
+      );
 
 
-        removedCount =
-          0;
+      celebrated =
+        false;
 
 
-        localStorage.setItem(
-          LS_REMOVED,
-          '0'
-        );
+      msgCard.classList.remove(
+        'show'
+      );
 
-
-        brickEls.forEach(
-          el =>
-            el.classList.remove(
-              'gone'
-            )
-        );
-
-
-        celebrated =
-          false;
-
-
-        msgCard.classList.remove(
-          'show'
-        );
-
-
-        /*
-         * 5) 완료 상태도 0이므로 진행률 0%로
-         *    정상 계산되어 재무너짐 없이 새 벽이 유지됨
-         */
-        renderTodos();
-
-      } finally {
-
-        setTimeout(() => {
-          pausePolling = false;
-        }, 500);
-
-      }
+/* 위젯의 투두만 비우기 */
+todos = [];
+saveTodos();
+      
+      renderTodos();
 
     }
   );
@@ -3195,7 +3087,7 @@
         if (
           viewingIndex !== null &&
           viewingIndex >= 0 &&
-          viewingIndex 
+          viewingIndex <
             collection.length
         ) {
 
@@ -3277,15 +3169,13 @@
    * Notion 데이터를 가져와서 덮어쓴다.
    *
    * 이것이 "Notion → 위젯" 부분이다.
-   *
-   * ⭐ 수정된 부분: pausePolling 체크 추가
    */
   if (notionConnected) {
 
     loadTodosFromNotion();
     
  setInterval(() => {
-    if (!isLoadingFromNotion && !pausePolling) {
+    if (!isLoadingFromNotion) {
       loadTodosFromNotion();
     }
   }, 3000);
