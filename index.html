@@ -1079,7 +1079,7 @@
    */
   let isLoadingFromNotion = false;
   let isResettingWall = false;
-
+  let isEditing = false;
   /*
    * 노션 연동 여부
    */
@@ -2744,6 +2744,8 @@
 
     input.select();
 
+    isEditing = true;
+
 
     let committed =
       false;
@@ -2784,7 +2786,7 @@
 
         renderTodos();
 
-
+      isEditing = false;
         /*
          * ⭐ 제목이 바뀌었으므로
          * Notion에도 PATCH
@@ -3190,10 +3192,11 @@
 
   loadTodosFromNotion();
     
- setInterval(() => {
+setInterval(() => {
   if (
     !isLoadingFromNotion &&
-    !isResettingWall
+    !isResettingWall &&
+    !isEditing
   ) {
     loadTodosFromNotion();
   }
