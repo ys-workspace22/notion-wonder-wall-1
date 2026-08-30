@@ -142,10 +142,10 @@ export default async function handler(req, res) {
           let date = null;
 
           if (
-            props['날짜'] &&
-            props['날짜'].date
+            props['생성일시'] &&
+            props['생성일시'].created_time
           ) {
-            date = props['날짜'].date.start || null;
+            date = props['생성일시'].created_time || null;
           }
 
           // ====================================
@@ -440,31 +440,24 @@ export default async function handler(req, res) {
               database_id: DATABASE_ID
             },
 
-            properties: {
+properties: {
 
-              // 할 일
-              '할 일': {
-                title: [
-                  {
-                    text: {
-                      content: task
-                    }
-                  }
-                ]
-              },
+  // 할 일
+  '할 일': {
+    title: [
+      {
+        text: {
+          content: task
+        }
+      }
+    ]
+  },
 
-              // 완료 여부
-              DONE: {
-                checkbox: !!done
-              },
-
-              // 날짜
-              날짜: {
-                date: {
-                  start: todayISO
-                }
-              }
-            }
+  // 완료 여부
+  DONE: {
+    checkbox: !!done
+  }
+}
           })
         }
       );
