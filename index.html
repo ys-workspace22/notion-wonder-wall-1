@@ -3167,11 +3167,17 @@
    *
    * 이것이 "Notion → 위젯" 부분이다.
    */
-  if (notionConnected) {
+ if (notionConnected) {
 
-    loadTodosFromNotion();
+  loadTodosFromNotion();
     
-  }
+  setInterval(() => {
+    if (!isLoadingFromNotion) {
+      loadTodosFromNotion();
+    }
+  }, 3000);
+
+}
 
 
 })();
