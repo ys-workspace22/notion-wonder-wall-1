@@ -2884,12 +2884,12 @@
        console.log('🔥 새 벽 클릭');
     console.log('현재 todos:', todos);
     
-    // 노션 DB 삭제
-    for (const t of todos) {
-      if (t.notionPageId) {
-        await deleteFromNotion(t.notionPageId);
-      }
-    }
+  // 노션 DB 삭제 (동시에 실행)
+await Promise.all(
+  todos
+    .filter(t => t.notionPageId)
+    .map(t => deleteFromNotion(t.notionPageId))
+);
 
     // 위젯 Todo 삭제
     todos = [];
